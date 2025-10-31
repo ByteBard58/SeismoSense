@@ -57,9 +57,9 @@ Open your browser and navigate to [http://127.0.0.1:5000](http://127.0.0.1:5000)
 
 ## 🐳 Run the app directly via Dockerhub Image
 
-A [**Dockerhub repository**](https://hub.docker.com/r/bytebard101/seismosense) is created where I have pushed the docker image which contains the entire **Cosmoclassifier** app. 
+I have used Docker to containerize the SeismoSense web app entirely. The [**Dockerhub repository**](https://hub.docker.com/r/bytebard101/seismosense) allows anyone with any operating system or other system configuration to easily run the app.
 
-The image is built on both ARM64 and AMD64 architectures, so that it can run on almost all major computers. You can run the app easily by using the Dockerhub Image. Here's how you can do it:
+The image is built on both ARM64 and AMD64 architectures, so that it can run on almost all major computers and servers. You can run the app easily by using the Dockerhub Image. Here's how you can do it:
 1. Install [**Docker Desktop**](https://www.docker.com/products/docker-desktop/) and sign-in. Make sure the app is functioning properly.
   
 2. Open Terminal and run:
