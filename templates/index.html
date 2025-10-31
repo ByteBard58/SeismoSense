@@ -47,6 +47,8 @@
                        0 0 0 1px rgba(0,212,170,0.12);
             position:relative;
             overflow:hidden;
+            display:flex;
+            flex-direction:column;
         }
         .logo{
             display:flex;
@@ -154,7 +156,7 @@
         }
         .conf-fill{
             height:100%;
-            width:0; /* Start at 0 */
+            width:0;
             border-radius:4px;
             transition:width 1.2s cubic-bezier(0.65, 0, 0.35, 1);
         }
@@ -166,6 +168,28 @@
         .conf-text{
             font-size:.88rem;
             color:var(--muted);
+        }
+
+        /* Footer */
+        .footer {
+            margin-top: 2rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid rgba(100, 110, 140, 0.3);
+            font-size: 0.8rem;
+            color: #64748b;
+            text-align: center;
+            line-height: 1.5;
+        }
+        .footer a {
+            color: var(--accent);
+            text-decoration: none;
+            font-weight: 500;
+        }
+        .footer a:hover {
+            text-decoration: underline;
+        }
+        .footer strong {
+            color: #cbd5e1;
         }
 
         /* Wave animation */
@@ -196,7 +220,6 @@
             to{opacity:1;transform:none;}
         }
 
-        /* Hidden by default */
         .hidden { display: none; }
     </style>
 </head>
@@ -265,6 +288,16 @@
         </div>
         {% endif %}
     </div>
+
+    <!-- Footer -->
+    <div class="footer">
+        <p>
+            Check the official GitHub repo for this web app
+            <a href="https://github.com/ByteBard58/SeismoSense" target="_blank">here</a>.<br>
+            The SeismoSense is licensed under the <strong>MIT License</strong>.<br>
+            &copy; 2025 <strong>Sakib Hossain</strong>. All rights reserved.
+        </p>
+    </div>
 </div>
 
 <script>
@@ -278,20 +311,17 @@
     const confFill = document.getElementById('confFill');
     const confValue = document.getElementById('confValue');
 
-    // Show loading
     form.addEventListener('submit', () => {
         btn.disabled = true;
         btnText.textContent = 'Analyzing…';
         loader.classList.remove('hidden');
-        resultContainer.classList.add('hidden'); // Hide previous result
+        resultContainer.classList.add('hidden');
     });
 
-    // On page load (after Flask renders), animate progress bar
     document.addEventListener('DOMContentLoaded', () => {
         if (confFill && confValue) {
             const width = confValue.textContent.trim();
             resultContainer.classList.remove('hidden');
-            // Trigger reflow + animate
             confFill.style.width = '0%';
             setTimeout(() => {
                 confFill.style.width = width + '%';
