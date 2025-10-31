@@ -1,4 +1,4 @@
-# SeismoSense 🌍⚡
+# SeismoSense 🌍
 
 **SeismoSense** is an AI-powered earthquake alert prediction system that leverages machine learning to analyze seismic data and provide instant alert predictions. This project combines cutting-edge ML pipelines, SMOTE oversampling for imbalanced data, and a sleek, futuristic Flask frontend with animated confidence bars.  
 
@@ -25,18 +25,14 @@
 
 ---
 
-## 📸 Screenshots
+## 📸 Screenshots 
 
-*(Place your screenshots here to grab attention — include model predictions + progress bar animation)*  
-
-1. **Input Form for Seismic Features**  
-   ![Screenshot Input](path/to/screenshot_input.png)
+1. **Landing Page**  
+   ![Screenshot Input](screenshots/landing.png)
 
 2. **Prediction Result with Confidence Bar**  
-   ![Screenshot Result](path/to/screenshot_result.png)
+   ![Screenshot Result](screenshots/prediction_1.png)
 
-3. **Model Training Metrics (Classification Report Example)**  
-   ![Screenshot Report](path/to/screenshot_report.png)
 
 ---
 
@@ -65,7 +61,7 @@ Open your browser and navigate to [http://127.0.0.1:5000](http://127.0.0.1:5000)
 
 ---
 
-## ## 🧠 Model Performance
+## 🧠 Model Performance
 
 The ML pipeline was trained on the **Earthquake Alert Prediction Dataset** using `RandomizedSearchCV` for hyperparameter tuning and **SMOTE** to handle class imbalance.  
 
@@ -146,5 +142,7 @@ This project is licensed under the **MIT License** — feel free to use, modify,
 ## 😃 Appreciation
 
 Thank you for visting the repository. I’d be thrilled to hear those! You can find my contact info on my [GitHub profile](https://github.com/ByteBard58).
+
+If you liked this project, please consider giving it a star 🌟
 
 Have a great day!
