@@ -61,6 +61,36 @@ Open your browser and navigate to [http://127.0.0.1:5000](http://127.0.0.1:5000)
 
 ---
 
+## 📊 Dataset Overview
+
+SeismoSense uses the **Earthquake Alert Prediction Dataset** from Kaggle, contributed by **Ahmed Mohamed Zaki**.  
+[Dataset link](https://www.kaggle.com/datasets/ahmeduzaki/earthquake-alert-prediction-dataset)  
+
+### Source & Purpose  
+The dataset compiles seismic measurements and historical alert levels, aiming to support predictive models for earthquake warning systems. It provides a real world challenge — classification under class imbalance with geophysical features.  
+
+### Features & Target  
+| Feature    | Meaning / Description                              |
+|------------|----------------------------------------------------|
+| magnitude  | Measured strength (Richter or comparable scale)     |
+| depth      | How deep the quake was beneath the surface           |
+| cdi        | Community Disaster Index (impact-based)             |
+| mmi        | Modified Mercalli Intensity (felt intensity)        |
+| sig        | Significance metric (statistical/energy measure)    |
+
+- **Target (alert):** The alert classification with four possible categories:
+  - `green`  
+  - `orange`  
+  - `red`  
+  - `yellow`  
+
+The original mapping used in the repository is:  
+```python
+{'green': 0, 'orange': 1, 'red': 2, 'yellow': 3}
+```
+
+---
+
 ## 🧠 Model Performance
 
 The ML pipeline was trained on the **Earthquake Alert Prediction Dataset** using `RandomizedSearchCV` for hyperparameter tuning and **SMOTE** to handle class imbalance.  
