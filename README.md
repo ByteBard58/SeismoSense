@@ -21,7 +21,7 @@
 - Built-in **SMOTE oversampling** inside the pipeline to handle class imbalance safely.
 - **Cross-validation aware** pipeline ensures no data leakage.
 - Animated **progress-bar style confidence** for predictions.
-- Modern, dark-themed UI inspired by UrbanEcho and CosmoClassifier.
+- Modern, dark-themed UI inspired by [**UrbanEcho**](https://github.com/ByteBard58/UrbanEcho) and [**CosmoClassifier**](https://github.com/ByteBard58/The_CosmoClassifier).
 
 ---
 
@@ -179,6 +179,8 @@ SEISMOSENSE/
 - Extend to batch prediction for CSV uploads.
 
 - Add user authentication and log predictions for research purposes.
+
+**Note:** Due to the absence of front-end web development expertise and the absence of other contributors for the project, I was compelled to utilize AI tools (such as LLM services like ChatGPT™, Grok™, and GitHub Copilot™) to develop a sophisticated front-end for the web app. I am looking forward to human contribution on this project in order to scale it even further.
 
 ---
 
