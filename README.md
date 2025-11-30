@@ -41,7 +41,7 @@
 1. Clone the repo and install dependencies:
 
 ```bash
-git clone https://github.com/your-username/SeismoSense.git
+git clone https://github.com/ByteBard58/SeismoSense.git
 cd SeismoSense
 pip install -r requirements.txt
 ```
