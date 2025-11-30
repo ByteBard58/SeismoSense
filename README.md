@@ -53,6 +53,18 @@ python app.py
 ```
 Open your browser and navigate to [http://127.0.0.1:5000](http://127.0.0.1:5000) to start predicting earthquake alerts!
 
+3. Run Marimo Notebook (Optional)
+To explore the research notebooks interactively:
+```bash
+marimo edit research.py
+```
+This command will open the notebook in your default browser. You can then run the cells interactively.
+
+If you just want to see the static notebook with the output of each cell, you can find them in the `reports` directory.
+
+To learn more about Marimo, visit their [official website](https://marimo.io/).
+
+
 ---
 
 ## 🐳 Run the app directly via Dockerhub Image
