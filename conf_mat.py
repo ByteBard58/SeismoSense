@@ -37,98 +37,116 @@ def plotting(x, y) -> None:
         x, y, test_size=2/10, random_state=120, shuffle=True, stratify=y
     )
 
-    labels = ["GALAXY", "STAR", "QSO"]
+    labels = ALERT_LABELS
     y_true = y_test
     y_pred = model.predict(x_test)
     cm = confusion_matrix(y_true, y_pred)
 
-    # Use dark background style
+    # ── Theme Configuration ─────────────────────────────────────────────────────
+    # Professional dark theme matching the frontend
     plt.style.use('dark_background')
-
-    # Theme colors matching the frontend CSS
-    BG_COLOR       = '#12121c'   # --bg-tertiary
-    TEXT_PRIMARY   = '#ffffff'   # --text-primary
-    TEXT_SECONDARY = '#8b8b9e'   # --text-secondary
-
-    # Class brand colors — used ONLY for tick labels
-    CLASS_COLORS = {
-        'GALAXY': '#7000ff',  # purple
-        'STAR':   '#00d4ff',  # cyan
-        'QSO':    '#ff6b6b',  # coral
-    }
-
-    # ── Colormap ────────────────────────────────────────────────────────────
-    # Single-hue dark → bright purple ramp.
-    # Keeps the grid visually consistent; class identity is communicated
-    # through the tick label colors above, not through the heatmap fill.
-    cmap_colors = [
-        '#05050a',  # near-black (zero / empty cells)
-        '#1a0535',  # very dark purple
-        '#3b0d7a',  # deep purple
-        '#5a12b8',  # mid purple
-        '#7000ff',  # brand purple  (GALAXY_COLOR)
-        '#9d4edd',  # bright lavender highlight
+    
+    BG_COLOR = '#0f1419'          # Dark background
+    CARD_BG = '#1a1f26'           # Card background
+    TEXT_PRIMARY = '#e2e8f0'      # Primary text
+    TEXT_SECONDARY = '#94a3b8'     # Muted text
+    ACCENT = '#00d4aa'            # Teal accent
+    
+    # Alert-specific colors for the heatmap
+    ALERT_HEATMAP_COLORS = [
+        '#0f1419',    # dark (zero counts)
+        '#1e3a4c',    # dark teal
+        '#00d4aa',    # accent teal
+        '#00ffcc',    # bright teal
+        '#ffffff',    # white (high counts)
     ]
-    cmap = mcolors.LinearSegmentedColormap.from_list('cosmo_purple', cmap_colors, N=256)
-
-    # ── Figure ───────────────────────────────────────────────────────────────
+    heatmap_cmap = mcolors.LinearSegmentedColormap.from_list('seismo_heat', ALERT_HEATMAP_COLORS, N=256)
+    
+    # ── Figure Setup ────────────────────────────────────────────────────────────
     fig, ax = plt.subplots(figsize=(10, 8))
     fig.patch.set_facecolor(BG_COLOR)
-    ax.set_facecolor(BG_COLOR)
-
+    ax.set_facecolor(CARD_BG)
+    
+    # Custom annotation colors based on cell value
+    def get_annot_color(val, max_val):
+        """Return white for dark cells, dark for bright cells"""
+        ratio = val / max_val if max_val > 0 else 0
+        return '#0f1419' if ratio > 0.4 else '#ffffff'
+    
+    # Create annotation matrix with custom colors
+    annot = np.empty_like(cm, dtype=object)
+    for i in range(cm.shape[0]):
+        for j in range(cm.shape[1]):
+            annot[i, j] = str(cm[i, j])
+    
+    max_val = cm.max()
+    
+    # ── Plot Heatmap ─────────────────────────────────────────────────────────────
     sns.heatmap(
         cm,
-        annot=True,
-        fmt='d',
-        cmap=cmap,
+        annot=annot,
+        fmt='',
+        cmap=heatmap_cmap,
         xticklabels=labels,
         yticklabels=labels,
         ax=ax,
         annot_kws={
-            'fontsize': 18,
-            'fontweight': 'bold',
-            'color': TEXT_PRIMARY
+            'fontsize': 20,
+            'fontweight': 'bold'
         },
         cbar_kws={
             'label': 'Count',
             'shrink': 0.8
         },
-        linewidths=3,
-        linecolor=BG_COLOR,
+        linewidths=2,
+        linecolor='#2d3748',
         square=True,
         vmin=0,
-        vmax=cm.max()
+        vmax=max_val
     )
-
-    # ── Axis labels ──────────────────────────────────────────────────────────
-    ax.set_xlabel('Predicted Classification', fontsize=14, fontweight='bold',
-                  color=TEXT_SECONDARY, labelpad=15)
-    ax.set_ylabel('True Classification', fontsize=14, fontweight='bold',
-                  color=TEXT_SECONDARY, labelpad=15)
-
-    # ── Tick labels — colored by class brand color ───────────────────────────
-    ax.tick_params(axis='x', colors=TEXT_SECONDARY, labelsize=12, rotation=0)
-    ax.tick_params(axis='y', colors=TEXT_SECONDARY, labelsize=12, rotation=0)
-
-    for label in ax.get_xticklabels():
-        label.set_color(CLASS_COLORS.get(label.get_text(), TEXT_SECONDARY))
-
-    for label in ax.get_yticklabels():
-        label.set_color(CLASS_COLORS.get(label.get_text(), TEXT_SECONDARY))
-
-    # ── Spines ───────────────────────────────────────────────────────────────
+    
+    # Update annotation colors dynamically
+    for i in range(cm.shape[0]):
+        for j in range(cm.shape[1]):
+            ax.texts[i * cm.shape[1] + j].set_color(
+                get_annot_color(cm[i, j], max_val)
+            )
+    
+    # ── Axis Labels ──────────────────────────────────────────────────────────────
+    ax.set_xlabel('Predicted Alert Level', fontsize=14, fontweight='bold',
+                  color=TEXT_PRIMARY, labelpad=15)
+    ax.set_ylabel('True Alert Level', fontsize=14, fontweight='bold',
+                  color=TEXT_PRIMARY, labelpad=15)
+    
+    # ── Tick Labels ──────────────────────────────────────────────────────────────
+    ax.tick_params(axis='x', colors=TEXT_SECONDARY, labelsize=11, rotation=0)
+    ax.tick_params(axis='y', colors=TEXT_SECONDARY, labelsize=11, rotation=0)
+    
+    # Color tick labels by alert severity
+    tick_colors = ['#22c55e', '#fb923c', '#ef4444', '#facc15']
+    for i, label in enumerate(ax.get_xticklabels()):
+        label.set_color(tick_colors[i] if i < len(tick_colors) else TEXT_SECONDARY)
+    
+    for i, label in enumerate(ax.get_yticklabels()):
+        label.set_color(tick_colors[i] if i < len(tick_colors) else TEXT_SECONDARY)
+    
+    # ── Spines ──────────────────────────────────────────────────────────────────
     for spine in ax.spines.values():
-        spine.set_color(BG_COLOR)
-        spine.set_linewidth(3)
-
-    # ── Colorbar ─────────────────────────────────────────────────────────────
+        spine.set_color('#2d3748')
+        spine.set_linewidth(2)
+    
+    # ── Colorbar ─────────────────────────────────────────────────────────────────
     cbar = ax.collections[0].colorbar
-    cbar.ax.tick_params(colors=TEXT_SECONDARY, labelsize=11)
+    cbar.ax.tick_params(colors=TEXT_SECONDARY, labelsize=10)
     cbar.set_label('Count', color=TEXT_SECONDARY, fontsize=12, labelpad=10)
-    cbar.outline.set_edgecolor(BG_COLOR)
+    cbar.outline.set_color('#2d3748')
     cbar.outline.set_linewidth(2)
-
-    # ── Save ─────────────────────────────────────────────────────────────────
+    
+    # ── Title ────────────────────────────────────────────────────────────────────
+    ax.set_title('Model Performance: Confusion Matrix', fontsize=16, fontweight='bold',
+                 color=TEXT_PRIMARY, pad=20)
+    
+    # ── Save ─────────────────────────────────────────────────────────────────────
     plt.tight_layout()
     plt.savefig(
         "static/confusion_matrix.png",
@@ -138,7 +156,7 @@ def plotting(x, y) -> None:
         bbox_inches='tight'
     )
     plt.close()
-    print("Saved and closed confusion matrix ✅")
+    print("Saved confusion matrix with earthquake alert labels ✅")
 
 
 def main() -> None:
