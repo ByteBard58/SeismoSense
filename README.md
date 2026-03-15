@@ -136,30 +136,45 @@ The ML pipeline was trained on the **Earthquake Alert Prediction Dataset** using
 | **Macro Avg**| 0.90     | 0.90   | 0.90     | 260    |
 | **Weighted Avg** | 0.90 | 0.90   | 0.90     | 260    |
 
-> ✅ Achieves 90% accuracy with balanced performance across all alert levels, showing robustness even on imbalanced data.
 
 ---
 
 ## 📁 Repository Structure
 
-```
-SEISMOSENSE/
-├── dataset/
-│ └── earthquake_data.csv   # Training dataset 
-├── models/
-│ ├── estimator.pkl         # Trained ML pipeline
-│ └── names.pkl             # Feature column names
-├── templates/
-│ └── index.html            # Frontend code
-├── .dockerignore           # Excludes unnecessary files from Docker build
-├── .gitignore              # Ignores venv, pycache, logs, etc.
-├── app.py                  # Flask server
-├── Dockerfile              # Containerizes the app for deployment
-├── fit.py                  # ML training script 
-├── LICENSE                 # MIT License
-├── README.md               # You’re reading it
-├── requirements.txt        # Python dependencies
-└── research.ipynb       # # Notebook used for testing, visualization and many more
+``` 
+SeismoSense/
+├─ .github/
+│  └─ workflows/
+│     ├─ docker.yml
+│     └─ python-app.yml
+├─ dataset/
+│  └─ earthquake_data.csv
+├─ models/
+│  ├─ estimator.pkl
+│  └─ names.pkl
+├─ reports/
+│  └─ research.html
+├─ screenshots/
+│  ├─ landing.png
+│  └─ prediction_1.png
+├─ static/
+│  ├─ confusion_matrix.png
+│  ├─ script.js
+│  └─ style.css
+├─ templates/
+│  └─ index.html
+├─ .dockerignore
+├─ .gitattributes
+├─ .gitignore
+├─ app.py
+├─ conf_mat.py
+├─ Dockerfile
+├─ fit.py
+├─ LICENSE
+├─ README.md
+├─ requirements.txt
+├─ research.py
+└─ tree.md
 ```
 
 ---
@@ -179,18 +194,6 @@ SEISMOSENSE/
 - **HTML/CSS** for modern UI with animation
 
 - **Docker** for containerized deployment
-
----
-
-## 🔮 Future Improvements
-
-- Add real-time earthquake data ingestion for live predictions.
-
-- Build a map-based visualization showing predicted alert levels geographically.
-
-- Extend to batch prediction for CSV uploads.
-
-- Add user authentication and log predictions for research purposes.
 
 ---
 
