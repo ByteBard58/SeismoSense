@@ -70,6 +70,18 @@ if (form && btn && btnText) {
     });
 }
 
+// Clear button — reset all inputs
+const clearBtn = document.getElementById('clearBtn');
+if (clearBtn && form) {
+    clearBtn.addEventListener('click', () => {
+        form.querySelectorAll('.form-input').forEach(input => {
+            input.value = '';
+        });
+        form.querySelector('.form-input').focus();
+    });
+}
+
+
 // On page load, reset button state and animate confidence bar
 document.addEventListener('DOMContentLoaded', () => {
     // Reset button state (in case of page reload with result)
