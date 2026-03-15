@@ -46,8 +46,8 @@ def plotting(x, y) -> None:
     # Professional dark theme matching the frontend
     plt.style.use('dark_background')
     
-    BG_COLOR = '#0f1419'          # Dark background
-    CARD_BG = '#1a1f26'           # Card background
+    BG_COLOR = '#151C26'          # Dark background
+    CARD_BG = "#050506"           # Card background
     TEXT_PRIMARY = '#e2e8f0'      # Primary text
     TEXT_SECONDARY = '#94a3b8'     # Muted text
     ACCENT = '#00d4aa'            # Teal accent
