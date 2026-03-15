@@ -4,10 +4,10 @@ import joblib
 import numpy as np
 from pathlib import Path
 from fit import main
-import secrets
+import os
 
 app = Flask(__name__)
-app.secret_key = secrets.token_hex(32)
+app.secret_key = os.environ.get("FLASK_SECRET_KEY", "a_static_secret_key_for_development")
 
 # paths to the pickle files
 MODEL_PATH = Path("models/estimator.pkl")
