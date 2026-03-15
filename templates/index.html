@@ -7,742 +7,8 @@
 
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 
-    <style>
-        :root {
-            /* Dark Theme Colors */
-            --bg-primary: #0a0e14;
-            --bg-secondary: #111820;
-            --bg-tertiary: #1a222d;
-            --bg-card: #151c26;
-            --bg-input: #0d1218;
-            
-            /* Accent Colors */
-            --accent: #00d4aa;
-            --accent-hover: #00f5c4;
-            --accent-muted: #00a88a;
-            
-            /* Text Colors */
-            --text-primary: #e6edf3;
-            --text-secondary: #8b949e;
-            --text-muted: #6e7681;
-            
-            /* Alert Colors */
-            --green: #22c55e;
-            --green-bg: rgba(34, 197, 94, 0.15);
-            --orange: #f97316;
-            --orange-bg: rgba(249, 115, 22, 0.15);
-            --red: #ef4444;
-            --red-bg: rgba(239, 68, 68, 0.15);
-            --yellow: #eab308;
-            --yellow-bg: rgba(234, 179, 8, 0.15);
-            
-            /* UI Elements */
-            --border: #30363d;
-            --border-focus: var(--accent);
-            
-            /* Shadows */
-            --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
-            --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.4);
-            --shadow-lg: 0 8px 30px rgba(0, 0, 0, 0.5);
-            --shadow-glow: 0 0 30px rgba(0, 212, 170, 0.15);
-        }
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-            background: var(--bg-primary);
-            color: var(--text-primary);
-            min-height: 100vh;
-            line-height: 1.6;
-        }
-
-        /* Background Pattern */
-        body::before {
-            content: '';
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: 
-                radial-gradient(ellipse at 20% 20%, rgba(0, 212, 170, 0.08) 0%, transparent 50%),
-                radial-gradient(ellipse at 80% 80%, rgba(0, 212, 170, 0.05) 0%, transparent 50%),
-                repeating-linear-gradient(
-                    0deg,
-                    transparent,
-                    transparent 50px,
-                    rgba(0, 212, 170, 0.02) 50px,
-                    rgba(0, 212, 170, 0.02) 51px
-                ),
-                repeating-linear-gradient(
-                    90deg,
-                    transparent,
-                    transparent 50px,
-                    rgba(0, 212, 170, 0.02) 50px,
-                    rgba(0, 212, 170, 0.02) 51px
-                );
-            pointer-events: none;
-            z-index: -1;
-        }
-
-        /* Header */
-        .header {
-            background: var(--bg-secondary);
-            border-bottom: 1px solid var(--border);
-            padding: 0 2rem;
-            position: sticky;
-            top: 0;
-            z-index: 100;
-            backdrop-filter: blur(10px);
-        }
-
-        .header-content {
-            max-width: 1400px;
-            margin: 0 auto;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            height: 70px;
-        }
-
-        .logo {
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-        }
-
-        .logo-icon {
-            width: 40px;
-            height: 40px;
-            background: linear-gradient(135deg, var(--accent), var(--accent-muted));
-            border-radius: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.25rem;
-            color: var(--bg-primary);
-        }
-
-        .logo-text {
-            font-size: 1.5rem;
-            font-weight: 700;
-            background: linear-gradient(135deg, var(--accent), #00f5c4);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-
-        /* Navigation Tabs */
-        .nav-tabs {
-            display: flex;
-            gap: 0.5rem;
-        }
-
-        .nav-tab {
-            padding: 0.625rem 1.25rem;
-            background: transparent;
-            border: none;
-            color: var(--text-secondary);
-            font-family: inherit;
-            font-size: 0.9rem;
-            font-weight: 500;
-            cursor: pointer;
-            border-radius: 8px;
-            transition: all 0.2s ease;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        .nav-tab:hover {
-            color: var(--text-primary);
-            background: var(--bg-tertiary);
-        }
-
-        .nav-tab.active {
-            color: var(--accent);
-            background: rgba(0, 212, 170, 0.1);
-        }
-
-        .nav-tab i {
-            font-size: 0.85rem;
-        }
-
-        /* Main Content */
-        .main-content {
-            max-width: 1400px;
-            margin: 0 auto;
-            padding: 2rem;
-        }
-
-        /* Tab Panels */
-        .tab-panel {
-            display: none;
-            animation: fadeIn 0.3s ease;
-        }
-
-        .tab-panel.active {
-            display: block;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        /* Dashboard Grid */
-        .dashboard-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 2rem;
-        }
-
-        @media (max-width: 1024px) {
-            .dashboard-grid {
-                grid-template-columns: 1fr;
-            }
-        }
-
-        /* Cards */
-        .card {
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            border-radius: 16px;
-            padding: 1.5rem;
-            box-shadow: var(--shadow-md);
-        }
-
-        .card-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 1.5rem;
-            padding-bottom: 1rem;
-            border-bottom: 1px solid var(--border);
-        }
-
-        .card-title {
-            font-size: 1.1rem;
-            font-weight: 600;
-            color: var(--text-primary);
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        .card-title i {
-            color: var(--accent);
-        }
-
-        /* Form Styles */
-        .form-group {
-            margin-bottom: 1.25rem;
-        }
-
-        .form-label {
-            display: block;
-            font-size: 0.85rem;
-            font-weight: 500;
-            color: var(--text-secondary);
-            margin-bottom: 0.5rem;
-        }
-
-        .form-label .required {
-            color: var(--red);
-        }
-
-        .form-input {
-            width: 100%;
-            padding: 0.875rem 1rem;
-            background: var(--bg-input);
-            border: 1px solid var(--border);
-            border-radius: 10px;
-            color: var(--text-primary);
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 0.95rem;
-            transition: all 0.2s ease;
-        }
-
-        .form-input:focus {
-            outline: none;
-            border-color: var(--accent);
-            box-shadow: 0 0 0 3px rgba(0, 212, 170, 0.15);
-        }
-
-        .form-input::placeholder {
-            color: var(--text-muted);
-        }
-
-        .form-help {
-            font-size: 0.75rem;
-            color: var(--text-muted);
-            margin-top: 0.375rem;
-        }
-
-        /* Button */
-        .btn {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 0.5rem;
-            padding: 0.875rem 1.5rem;
-            background: linear-gradient(135deg, var(--accent), var(--accent-muted));
-            color: var(--bg-primary);
-            font-family: inherit;
-            font-size: 0.95rem;
-            font-weight: 600;
-            border: none;
-            border-radius: 10px;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            width: 100%;
-            margin-top: 0.5rem;
-        }
-
-        .btn:hover {
-            transform: translateY(-2px);
-            box-shadow: var(--shadow-glow);
-        }
-
-        .btn:active {
-            transform: translateY(0);
-        }
-
-        .btn:disabled {
-            opacity: 0.7;
-            cursor: not-allowed;
-            transform: none;
-        }
-
-        .btn i {
-            font-size: 1rem;
-        }
-
-        /* Spinner */
-        .spinner {
-            width: 20px;
-            height: 20px;
-            border: 2px solid transparent;
-            border-top-color: currentColor;
-            border-radius: 50%;
-            animation: spin 0.8s linear infinite;
-        }
-
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-
-        /* Result Display */
-        .result-card {
-            margin-top: 1.5rem;
-            padding: 1.5rem;
-            border-radius: 12px;
-            animation: slideIn 0.4s ease;
-        }
-
-        @keyframes slideIn {
-            from {
-                opacity: 0;
-                transform: translateY(-10px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .result-card.green {
-            background: var(--green-bg);
-            border: 1px solid var(--green);
-        }
-
-        .result-card.orange {
-            background: var(--orange-bg);
-            border: 1px solid var(--orange);
-        }
-
-        .result-card.red {
-            background: var(--red-bg);
-            border: 1px solid var(--red);
-        }
-
-        .result-card.yellow {
-            background: var(--yellow-bg);
-            border: 1px solid var(--yellow);
-        }
-
-        .result-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 1rem;
-        }
-
-        .result-label {
-            font-size: 0.85rem;
-            font-weight: 500;
-            color: var(--text-secondary);
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-        }
-
-        .result-value {
-            font-size: 1.5rem;
-            font-weight: 700;
-        }
-
-        .result-card.green .result-value { color: var(--green); }
-        .result-card.orange .result-value { color: var(--orange); }
-        .result-card.red .result-value { color: var(--red); }
-        .result-card.yellow .result-value { color: var(--yellow); }
-
-        .confidence-bar {
-            height: 8px;
-            background: var(--bg-tertiary);
-            border-radius: 4px;
-            overflow: hidden;
-            margin: 0.75rem 0;
-        }
-
-        .confidence-fill {
-            height: 100%;
-            border-radius: 4px;
-            transition: width 1s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        .confidence-fill.green { background: var(--green); }
-        .confidence-fill.orange { background: var(--orange); }
-        .confidence-fill.red { background: var(--red); }
-        .confidence-fill.yellow { background: var(--yellow); }
-
-        .confidence-text {
-            font-size: 0.8rem;
-            color: var(--text-secondary);
-        }
-
-        .confidence-text span {
-            font-family: 'JetBrains Mono', monospace;
-            font-weight: 600;
-            color: var(--text-primary);
-        }
-
-        /* Stats Grid */
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 1rem;
-            margin-bottom: 1.5rem;
-        }
-
-        .stat-item {
-            background: var(--bg-tertiary);
-            border-radius: 10px;
-            padding: 1rem;
-            text-align: center;
-        }
-
-        .stat-value {
-            font-size: 1.75rem;
-            font-weight: 700;
-            color: var(--accent);
-            font-family: 'JetBrains Mono', monospace;
-        }
-
-        .stat-label {
-            font-size: 0.75rem;
-            color: var(--text-muted);
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            margin-top: 0.25rem;
-        }
-
-        /* Confusion Matrix */
-        .conf-matrix-container {
-            text-align: center;
-            padding: 1rem;
-        }
-
-        .conf-matrix-img {
-            max-width: 100%;
-            height: auto;
-            border-radius: 8px;
-            box-shadow: var(--shadow-md);
-        }
-
-        /* Alert Level Cards */
-        .alert-levels {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 1rem;
-            margin-top: 1.5rem;
-        }
-
-        .alert-level {
-            padding: 1rem;
-            border-radius: 10px;
-            text-align: center;
-        }
-
-        .alert-level.green {
-            background: var(--green-bg);
-            border: 1px solid var(--green);
-        }
-
-        .alert-level.orange {
-            background: var(--orange-bg);
-            border: 1px solid var(--orange);
-        }
-
-        .alert-level.red {
-            background: var(--red-bg);
-            border: 1px solid var(--red);
-        }
-
-        .alert-level.yellow {
-            background: var(--yellow-bg);
-            border: 1px solid var(--yellow);
-        }
-
-        .alert-level-icon {
-            font-size: 1.5rem;
-            margin-bottom: 0.5rem;
-        }
-
-        .alert-level.green .alert-level-icon { color: var(--green); }
-        .alert-level.orange .alert-level-icon { color: var(--orange); }
-        .alert-level.red .alert-level-icon { color: var(--red); }
-        .alert-level.yellow .alert-level-icon { color: var(--yellow); }
-
-        .alert-level-name {
-            font-weight: 600;
-            font-size: 0.9rem;
-        }
-
-        .alert-level.green .alert-level-name { color: var(--green); }
-        .alert-level.orange .alert-level-name { color: var(--orange); }
-        .alert-level.red .alert-level-name { color: var(--red); }
-        .alert-level.yellow .alert-level-name { color: var(--yellow); }
-
-        .alert-level-desc {
-            font-size: 0.75rem;
-            color: var(--text-muted);
-            margin-top: 0.25rem;
-        }
-
-        /* About Section */
-        .about-content {
-            max-width: 800px;
-            margin: 0 auto;
-        }
-
-        .about-card {
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            border-radius: 16px;
-            padding: 2rem;
-            margin-bottom: 1.5rem;
-        }
-
-        .about-title {
-            font-size: 1.25rem;
-            font-weight: 600;
-            color: var(--accent);
-            margin-bottom: 1rem;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        .about-text {
-            color: var(--text-secondary);
-            font-size: 0.95rem;
-            line-height: 1.7;
-        }
-
-        .feature-list {
-            list-style: none;
-            margin-top: 1rem;
-        }
-
-        .feature-list li {
-            padding: 0.5rem 0;
-            color: var(--text-secondary);
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-        }
-
-        .feature-list li i {
-            color: var(--accent);
-            font-size: 0.85rem;
-        }
-
-        .tech-stack {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 0.5rem;
-            margin-top: 1rem;
-        }
-
-        .tech-badge {
-            padding: 0.375rem 0.75rem;
-            background: var(--bg-tertiary);
-            border: 1px solid var(--border);
-            border-radius: 6px;
-            font-size: 0.8rem;
-            color: var(--text-secondary);
-        }
-
-        /* Footer */
-        .footer {
-            text-align: center;
-            padding: 2rem;
-            color: var(--text-muted);
-            font-size: 0.85rem;
-            border-top: 1px solid var(--border);
-            margin-top: 2rem;
-        }
-
-        .footer a {
-            color: var(--accent);
-            text-decoration: none;
-            font-weight: 500;
-        }
-
-        .footer a:hover {
-            text-decoration: underline;
-        }
-
-        /* Error State */
-        .error-message {
-            background: var(--red-bg);
-            border: 1px solid var(--red);
-            border-radius: 10px;
-            padding: 1rem;
-            color: var(--red);
-            font-size: 0.9rem;
-            margin-top: 1rem;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        /* Responsive */
-        @media (max-width: 768px) {
-            .header {
-                padding: 0 1rem;
-            }
-            
-            .header-content {
-                flex-direction: column;
-                height: auto;
-                padding: 1rem 0;
-                gap: 1rem;
-            }
-            
-            .nav-tabs {
-                width: 100%;
-                justify-content: center;
-            }
-            
-            .nav-tab {
-                padding: 0.5rem 0.75rem;
-                font-size: 0.8rem;
-            }
-            
-            .nav-tab span {
-                display: none;
-            }
-            
-            .main-content {
-                padding: 1rem;
-            }
-            
-            .alert-levels {
-                grid-template-columns: 1fr;
-            }
-        }
-
-        /* Footer Styles */
-        .footer {
-            background: var(--bg-secondary);
-            border-top: 1px solid var(--border);
-            padding: 0;
-            margin-top: 2rem;
-        }
-
-        .footer-content {
-            max-width: 1400px;
-            margin: 0 auto;
-            padding: 1.5rem 2rem;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 1rem;
-        }
-
-        .footer-brand {
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-            font-size: 0.95rem;
-            color: var(--text-secondary);
-        }
-
-        .footer-brand span:first-child {
-            font-weight: 600;
-            color: var(--accent);
-        }
-
-        .footer-divider {
-            color: var(--text-muted);
-        }
-
-        .footer-links {
-            display: flex;
-            gap: 1rem;
-        }
-
-        .footer-link {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
-            color: var(--text-secondary);
-            text-decoration: none;
-            font-size: 0.9rem;
-            transition: color 0.2s ease;
-        }
-
-        .footer-link svg {
-            width: 18px;
-            height: 18px;
-        }
-
-        .footer-link:hover {
-            color: var(--accent);
-        }
-
-        .footer-copyright {
-            font-size: 0.85rem;
-            color: var(--text-muted);
-        }
-
-        .footer-link-inline {
-            color: var(--accent);
-            text-decoration: none;
-            font-weight: 500;
-        }
-
-        .footer-link-inline:hover {
-            text-decoration: underline;
-        }
-    </style>
 </head>
 <body>
 
@@ -750,9 +16,6 @@
     <header class="header">
         <div class="header-content">
             <div class="logo">
-                <div class="logo-icon">
-                    <i class="fas fa-seismic"></i>
-                </div>
                 <span class="logo-text">SeismoSense</span>
             </div>
             
@@ -838,13 +101,22 @@
                         <button type="submit" class="btn" id="predictBtn">
                             <span class="btn-text">
                                 <i class="fas fa-bolt"></i>
-                                Analyze & Predict
+                                Analyze &amp; Predict
                             </span>
-                            <span class="spinner hidden" id="loader"></span>
+                            <span class="spinner" id="loader"></span>
                         </button>
                     </form>
+                </div>
 
-                    <!-- Result Display -->
+                <!-- Result Panel (Right Side) -->
+                <div class="card" id="resultPanel">
+                    <div class="card-header">
+                        <h2 class="card-title">
+                            <i class="fas fa-chart-pie"></i>
+                            Prediction Result
+                        </h2>
+                    </div>
+                    
                     {% if result and result != 'Error' %}
                     <div class="result-card {{ result }}">
                         <div class="result-header">
@@ -865,61 +137,64 @@
                         <i class="fas fa-exclamation-triangle"></i>
                         {{ result }}
                     </div>
+                    {% else %}
+                    <div class="empty-result">
+                        <div class="empty-icon">
+                            <i class="fas fa-seismic"></i>
+                        </div>
+                        <p class="empty-text">Enter earthquake parameters and click "Analyze &amp; Predict"</p>
+                    </div>
                     {% endif %}
-                </div>
-
-                <!-- Info Panel -->
-                <div class="card">
-                    <div class="card-header">
-                        <h2 class="card-title">
-                            <i class="fas fa-info-circle"></i>
-                            Alert Levels Guide
-                        </h2>
-                    </div>
                     
-                    <p class="about-text" style="margin-bottom: 1rem;">
-                        SeismoSense classifies earthquakes into four alert levels based on multiple seismic parameters:
-                    </p>
-                    
-                    <div class="alert-levels">
-                        <div class="alert-level green">
-                            <div class="alert-level-icon">
-                                <i class="fas fa-check-circle"></i>
+                    <!-- Alert Level Cards with Descriptions -->
+                    <div style="margin-top: 1.5rem;">
+                        <h4 style="font-size: 0.9rem; font-weight: 600; color: var(--text-secondary); margin-bottom: 0.75rem;">
+                            <i class="fas fa-info-circle"></i> Alert Levels Guide
+                        </h4>
+                        <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 1rem;">
+                            SeismoSense classifies earthquakes into four alert levels based on multiple seismic parameters:
+                        </p>
+                        <div class="alert-levels">
+                            <div class="alert-level green">
+                                <div class="alert-level-icon">
+                                    <i class="fas fa-check-circle"></i>
+                                </div>
+                                <div class="alert-level-name">Green (Low)</div>
+                                <div class="alert-level-desc">Minor seismic activity, minimal risk</div>
                             </div>
-                            <div class="alert-level-name">Green (Low)</div>
-                            <div class="alert-level-desc">Minor seismic activity, minimal risk</div>
-                        </div>
-                        
-                        <div class="alert-level orange">
-                            <div class="alert-level-icon">
-                                <i class="fas fa-exclamation-circle"></i>
+                            
+                            <div class="alert-level orange">
+                                <div class="alert-level-icon">
+                                    <i class="fas fa-exclamation-circle"></i>
+                                </div>
+                                <div class="alert-level-name">Orange (Moderate)</div>
+                                <div class="alert-level-desc">Moderate earthquake, some damage possible</div>
                             </div>
-                            <div class="alert-level-name">Orange (Moderate)</div>
-                            <div class="alert-level-desc">Moderate earthquake, some damage possible</div>
-                        </div>
-                        
-                        <div class="alert-level red">
-                            <div class="alert-level-icon">
-                                <i class="fas fa-radiation"></i>
+                            
+                            <div class="alert-level red">
+                                <div class="alert-level-icon">
+                                    <i class="fas fa-radiation"></i>
+                                </div>
+                                <div class="alert-level-name">Red (High)</div>
+                                <div class="alert-level-desc">Major earthquake, significant damage expected</div>
                             </div>
-                            <div class="alert-level-name">Red (High)</div>
-                            <div class="alert-level-desc">Major earthquake, significant damage expected</div>
-                        </div>
-                        
-                        <div class="alert-level yellow">
-                            <div class="alert-level-icon">
-                                <i class="fas fa-eye"></i>
+                            
+                            <div class="alert-level yellow">
+                                <div class="alert-level-icon">
+                                    <i class="fas fa-eye"></i>
+                                </div>
+                                <div class="alert-level-name">Yellow (Watch)</div>
+                                <div class="alert-level-desc">Elevated activity, potential for escalation</div>
                             </div>
-                            <div class="alert-level-name">Yellow (Watch)</div>
-                            <div class="alert-level-desc">Elevated activity, potential for escalation</div>
                         </div>
                     </div>
                     
-                    <div style="margin-top: 2rem; padding: 1rem; background: var(--bg-tertiary); border-radius: 10px;">
-                        <h4 style="font-size: 0.9rem; font-weight: 600; margin-bottom: 0.5rem; color: var(--accent);">
+                    <!-- Quick Tip -->
+                    <div style="margin-top: 1.5rem; padding: 1rem; background: var(--bg-tertiary); border-radius: 10px;">
+                        <h4 style="font-size: 0.85rem; font-weight: 600; margin-bottom: 0.5rem; color: var(--accent);">
                             <i class="fas fa-lightbulb"></i> Quick Tip
                         </h4>
-                        <p style="font-size: 0.85rem; color: var(--text-secondary);">
+                        <p style="font-size: 0.8rem; color: var(--text-secondary);">
                             For accurate predictions, use data from reliable seismic monitoring stations. 
                             CDI and MMI values are typically derived from crowd-sourced reports and instrumental readings.
                         </p>
@@ -988,37 +263,6 @@
                             <li>
                                 <i class="fas fa-arrow-down"></i>
                                 <strong>Columns</strong> — Predicted labels
-                            </li>
-                        </ul>
-                    </div>
-                </div>
-                
-                <!-- Model Info -->
-                <div class="card">
-                    <div class="card-header">
-                        <h2 class="card-title">
-                            <i class="fas fa-robot"></i>
-                            Model Information
-                        </h2>
-                    </div>
-                    
-                    <div class="about-text">
-                        <ul class="feature-list">
-                            <li>
-                                <i class="fas fa-database"></i>
-                                <strong>Dataset</strong> — earthquake_data.csv
-                            </li>
-                            <li>
-                                <i class="fas fa-code-branch"></i>
-                                <strong>Algorithm</strong> — Random Forest Classifier
-                            </li>
-                            <li>
-                                <i class="fas fa-percentage"></i>
-                                <strong>Train/Test Split</strong> — 80/20
-                            </li>
-                            <li>
-                                <i class="fas fa-random"></i>
-                                <strong>Random State</strong> — 120
                             </li>
                         </ul>
                     </div>
@@ -1106,13 +350,14 @@
 
     </main>
 
+    <!-- Toast Notification Container -->
+    <div id="toast-container" class="toast-container"></div>
+
     <!-- Footer -->
     <footer class="footer">
         <div class="footer-content">
             <div class="footer-brand">
                 <span>SeismoSense</span>
-                <span class="footer-divider">•</span>
-                <span>AI-Powered Earthquake Alert Classifier</span>
             </div>
             <div class="footer-links">
                 <a href="https://github.com/ByteBard58/SeismoSense" target="_blank" class="footer-link">
@@ -1128,49 +373,7 @@
         </div>
     </footer>
 
-    <script>
-        // Tab Navigation
-        const tabs = document.querySelectorAll('.nav-tab');
-        const panels = document.querySelectorAll('.tab-panel');
-
-        tabs.forEach(tab => {
-            tab.addEventListener('click', () => {
-                // Remove active class from all tabs and panels
-                tabs.forEach(t => t.classList.remove('active'));
-                panels.forEach(p => p.classList.remove('active'));
-                
-                // Add active class to clicked tab and corresponding panel
-                tab.classList.add('active');
-                const panelId = tab.dataset.tab + '-panel';
-                document.getElementById(panelId).classList.add('active');
-            });
-        });
-
-        // Form Submission
-        const form = document.getElementById('seismoForm');
-        const btn = document.getElementById('predictBtn');
-        const btnText = btn.querySelector('.btn-text');
-        const loader = document.getElementById('loader');
-
-        form.addEventListener('submit', () => {
-            btn.disabled = true;
-            btnText.innerHTML = '<span class="spinner"></span> Analyzing...';
-            loader.classList.remove('hidden');
-        });
-
-        // Confidence Bar Animation
-        document.addEventListener('DOMContentLoaded', () => {
-            const confFill = document.getElementById('confFill');
-            const confValue = document.getElementById('confValue');
-            
-            if (confFill && confValue) {
-                const width = confValue.textContent.trim();
-                setTimeout(() => {
-                    confFill.style.width = width + '%';
-                }, 100);
-            }
-        });
-    </script>
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
 
 </body>
 </html>
