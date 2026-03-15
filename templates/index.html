@@ -5,331 +5,381 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SeismoSense – AI Earthquake Alert Classifier</title>
 
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <script src="https://unpkg.com/feather-icons"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 
-    <style>
-        :root {
-            --bg-start: #0b1d26;
-            --bg-mid:   #1a3a45;
-            --bg-end:   #2c5364;
-            --card-bg:  rgba(10,20,30,0.78);
-            --accent:   #00d4aa;
-            --accent-dark: #00b894;
-            --text:     #e2e8f0;
-            --muted:    #94a3b8;
-            --danger:   #ef4444;
-            --warning:  #fb923c;
-            --safe:     #22c55e;
-            --info:     #0ea5e9;
-        }
-
-        *{margin:0;padding:0;box-sizing:border-box;}
-        body{
-            font-family:'Inter',sans-serif;
-            background:linear-gradient(135deg,var(--bg-start),var(--bg-mid),var(--bg-end));
-            color:var(--text);
-            min-height:100vh;
-            display:flex;
-            align-items:center;
-            justify-content:center;
-            padding:1rem;
-            overflow-x:hidden;
-        }
-        .container{
-            background:var(--card-bg);
-            backdrop-filter:blur(12px);
-            border-radius:1.2rem;
-            padding:2rem;
-            width:100%;
-            max-width:420px;
-            box-shadow:0 12px 32px rgba(0,0,0,0.35),
-                       0 0 0 1px rgba(0,212,170,0.12);
-            position:relative;
-            overflow:hidden;
-            display:flex;
-            flex-direction:column;
-        }
-        .logo{
-            display:flex;
-            align-items:center;
-            justify-content:center;
-            gap:.5rem;
-            margin-bottom:.5rem;
-        }
-        .logo svg{width:34px;height:34px;stroke:var(--accent);stroke-width:2.4;}
-        .logo h1{
-            font-size:1.75rem;
-            font-weight:700;
-            color:var(--accent);
-        }
-        .tagline{
-            text-align:center;
-            font-size:.92rem;
-            color:var(--muted);
-            margin-bottom:1.5rem;
-        }
-
-        /* Form */
-        .form-group{
-            margin-bottom:1.1rem;
-        }
-        label{
-            display:block;
-            font-weight:600;
-            font-size:.9rem;
-            margin-bottom:.35rem;
-            color:#cbd5e1;
-        }
-        input[type=number]{
-            width:100%;
-            padding:.75rem 1rem;
-            background:rgba(30,35,55,.7);
-            border:1px solid rgba(100,110,140,.4);
-            border-radius:.6rem;
-            color:var(--text);
-            font-size:1rem;
-            transition:border .2s,box-shadow .2s;
-        }
-        input:focus{
-            outline:none;
-            border-color:var(--accent);
-            box-shadow:0 0 0 3px rgba(0,212,170,.2);
-        }
-        .help{
-            font-size:.78rem;
-            color:#64748b;
-            margin-top:.25rem;
-            display:block;
-        }
-
-        button{
-            width:100%;
-            padding:.9rem;
-            margin-top:1rem;
-            background:linear-gradient(135deg,var(--accent),var(--accent-dark));
-            color:#fff;
-            font-weight:600;
-            font-size:1rem;
-            border:none;
-            border-radius:.6rem;
-            cursor:pointer;
-            display:flex;
-            align-items:center;
-            justify-content:center;
-            gap:.5rem;
-            transition:transform .2s,box-shadow .2s;
-        }
-        button:hover{
-            transform:translateY(-2px);
-            box-shadow:0 8px 20px rgba(0,212,170,.3);
-        }
-        .loader{
-            width:18px;height:18px;
-            border:2px solid transparent;
-            border-top:2px solid #fff;
-            border-radius:50%;
-            animation:spin 1s linear infinite;
-        }
-        @keyframes spin{to{transform:rotate(360deg);}}
-
-        /* Result */
-        .result{
-            margin-top:1.5rem;
-            padding:1.2rem;
-            border-radius:.8rem;
-            text-align:center;
-            font-weight:600;
-            animation:fadeIn .4s ease-out;
-        }
-        .result.safe   {background:rgba(34,197,94,.2);border:1px solid var(--safe);color:#86efac;}
-        .result.orange {background:rgba(251,146,60,.2);border:1px solid var(--warning);color:#fb923c;}
-        .result.red    {background:rgba(239,68,68,.2);border:1px solid var(--danger);color:#fca5a5;}
-        .result.yellow {background:rgba(250,204,21,.2);border:1px solid #facc15;color:#fde047;}
-
-        .conf-bar{
-            height:8px;
-            background:#1e293b;
-            border-radius:4px;
-            overflow:hidden;
-            margin: .8rem 0;
-        }
-        .conf-fill{
-            height:100%;
-            width:0;
-            border-radius:4px;
-            transition:width 1.2s cubic-bezier(0.65, 0, 0.35, 1);
-        }
-        .conf-fill.green  {background:#22c55e;}
-        .conf-fill.orange {background:#fb923c;}
-        .conf-fill.red    {background:#ef4444;}
-        .conf-fill.yellow {background:#facc15;}
-
-        .conf-text{
-            font-size:.88rem;
-            color:var(--muted);
-        }
-
-        /* Footer */
-        .footer {
-            margin-top: 2rem;
-            padding-top: 1.5rem;
-            border-top: 1px solid rgba(100, 110, 140, 0.3);
-            font-size: 0.8rem;
-            color: #64748b;
-            text-align: center;
-            line-height: 1.5;
-        }
-        .footer a {
-            color: var(--accent);
-            text-decoration: none;
-            font-weight: 500;
-        }
-        .footer a:hover {
-            text-decoration: underline;
-        }
-        .footer strong {
-            color: #cbd5e1;
-        }
-
-        /* Wave animation */
-        .wave-bg{
-            position:absolute;
-            inset:0;
-            overflow:hidden;
-            pointer-events:none;
-            z-index:-1;
-        }
-        .wave{
-            position:absolute;
-            bottom:0;
-            width:200%;
-            height:180px;
-            background:linear-gradient(90deg,transparent,rgba(0,212,170,.04),transparent);
-            animation:wave 9s cubic-bezier(.36,.45,.63,.53) infinite;
-        }
-        .wave:nth-child(1){animation-duration:7s;opacity:.6;}
-        .wave:nth-child(2){animation-duration:11s;opacity:.3;animation-delay:-2s;}
-        @keyframes wave{
-            0%{transform:translateX(0);}
-            100%{transform:translateX(-50%);}
-        }
-
-        @keyframes fadeIn{
-            from{opacity:0;transform:translateY(10px);}
-            to{opacity:1;transform:none;}
-        }
-
-        .hidden { display: none; }
-    </style>
 </head>
 <body>
 
-<div class="wave-bg">
-    <div class="wave"></div>
-    <div class="wave"></div>
-</div>
-
-<div class="container">
-    <div class="logo">
-        <svg viewBox="0 0 24 24"><path fill="none" d="M12 2v20M3 12h18M5.5 5.5l13 13M5.5 18.5l13-13"/></svg>
-        <h1>SeismoSense</h1>
-    </div>
-    <p class="tagline">AI-Powered Earthquake Alert Classifier</p>
-
-    <form method="POST" id="seismoForm">
-        <div class="form-group">
-            <label for="magnitude">Magnitude (Richter)</label>
-            <input type="number" step="0.01" name="magnitude" id="magnitude" required>
-            <small class="help">Typical range: 0.0 – 9.0</small>
-        </div>
-
-        <div class="form-group">
-            <label for="depth">Depth (km)</label>
-            <input type="number" step="0.01" name="depth" id="depth" required>
-        </div>
-
-        <div class="form-group">
-            <label for="cdi">CDI (Community Decimal Intensity)</label>
-            <input type="number" step="0.01" name="cdi" id="cdi" required>
-        </div>
-
-        <div class="form-group">
-            <label for="mmi">MMI (Modified Mercalli Intensity)</label>
-            <input type="number" step="0.01" name="mmi" id="mmi" required>
-        </div>
-
-        <div class="form-group">
-            <label for="sig">SIG (Significance)</label>
-            <input type="number" step="0.01" name="sig" id="sig" required>
-        </div>
-
-        <button type="submit" id="predictBtn">
-            <span class="btn-text">Predict Alert</span>
-            <span class="loader hidden" id="loader"></span>
-        </button>
-    </form>
-
-    <!-- Result Section -->
-    <div id="resultContainer" class="hidden">
-        {% if result and result != 'Error' %}
-        <div class="result {{ result }}">
-            <strong>Predicted Alert: {{ result | upper }}</strong>
-            {% if confidence %}
-            <p class="conf-text">Confidence: <span id="confValue">{{ confidence }}</span>%</p>
-            <div class="conf-bar">
-                <div id="confFill" class="conf-fill {{ result }}" style="width: 0%;"></div>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-content">
+            <div class="logo">
+                <span class="logo-text">SeismoSense</span>
             </div>
-            {% endif %}
+            
+            <nav class="nav-tabs">
+                <button class="nav-tab active" data-tab="predict">
+                    <i class="fas fa-bolt"></i>
+                    <span>Predict</span>
+                </button>
+                <button class="nav-tab" data-tab="performance">
+                    <i class="fas fa-chart-line"></i>
+                    <span>Performance</span>
+                </button>
+                <button class="nav-tab" data-tab="about">
+                    <i class="fas fa-info-circle"></i>
+                    <span>About</span>
+                </button>
+            </nav>
         </div>
-        {% elif result and result.startswith('Error') %}
-        <div class="result red">
-            <strong>{{ result }}</strong>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        
+        <!-- Predict Tab -->
+        <div class="tab-panel active" id="predict-panel">
+            <div class="dashboard-grid">
+                
+                <!-- Input Form -->
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title">
+                            <i class="fas fa-sliders"></i>
+                            Earthquake Parameters
+                        </h2>
+                    </div>
+                    
+                    <form method="POST" id="seismoForm">
+                        <div class="form-group">
+                            <label class="form-label">
+                                Magnitude <span class="required">*</span>
+                            </label>
+                            <input type="number" step="0.01" name="magnitude" id="magnitude" 
+                                   class="form-input" placeholder="e.g., 5.8" required>
+                            <p class="form-help">Richter scale magnitude (0.0 – 9.0+)</p>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">
+                                Depth <span class="required">*</span>
+                            </label>
+                            <input type="number" step="0.01" name="depth" id="depth" 
+                                   class="form-input" placeholder="e.g., 33.5" required>
+                            <p class="form-help">Depth of earthquake in kilometers</p>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">
+                                CDI <span class="required">*</span>
+                            </label>
+                            <input type="number" step="0.01" name="cdi" id="cdi" 
+                                   class="form-input" placeholder="e.g., 6.5" required>
+                            <p class="form-help">Community Decimal Intensity (0-10)</p>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">
+                                MMI <span class="required">*</span>
+                            </label>
+                            <input type="number" step="0.01" name="mmi" id="mmi" 
+                                   class="form-input" placeholder="e.g., 7.0" required>
+                            <p class="form-help">Modified Mercalli Intensity (0-10)</p>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">
+                                SIG <span class="required">*</span>
+                            </label>
+                            <input type="number" step="0.01" name="sig" id="sig" 
+                                   class="form-input" placeholder="e.g., 850" required>
+                            <p class="form-help">Significance parameter (0-1000)</p>
+                        </div>
+
+                        <div class="btn-row">
+                            <button type="submit" class="btn" id="predictBtn">
+                                <span class="btn-text">
+                                    <i class="fas fa-bolt"></i>
+                                    Analyze &amp; Predict
+                                </span>
+                                <span class="spinner" id="loader"></span>
+                            </button>
+                            <button type="button" class="btn btn-secondary" id="clearBtn">
+                                <i class="fas fa-times"></i>
+                                Clear
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Result Panel (Right Side) -->
+                <div class="card" id="resultPanel">
+                    <div class="card-header">
+                        <h2 class="card-title">
+                            <i class="fas fa-chart-pie"></i>
+                            Prediction Result
+                        </h2>
+                    </div>
+                    
+                    {% if result and result != 'Error' %}
+                    <div class="result-card {{ result }}">
+                        <div class="result-header">
+                            <span class="result-label">Predicted Alert</span>
+                            <span class="result-value">{{ result | upper }}</span>
+                        </div>
+                        {% if confidence %}
+                        <div class="confidence-bar">
+                            <div class="confidence-fill {{ result }}" id="confFill" style="width: 0%;"></div>
+                        </div>
+                        <p class="confidence-text">
+                            Confidence: <span id="confValue">{{ confidence }}</span>%
+                        </p>
+                        {% endif %}
+                    </div>
+                    {% elif result and result.startswith('Error') %}
+                    <div class="error-message">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        {{ result }}
+                    </div>
+                    {% else %}
+                    <div class="empty-result">
+                        <div class="empty-icon">
+                            <i class="fas fa-seismic"></i>
+                        </div>
+                        <p class="empty-text">Enter earthquake parameters and click "Analyze &amp; Predict"</p>
+                    </div>
+                    {% endif %}
+                    
+                    <!-- Alert Level Cards with Descriptions -->
+                    <div style="margin-top: 1.5rem;">
+                        <h4 style="font-size: 0.9rem; font-weight: 600; color: var(--text-secondary); margin-bottom: 0.75rem;">
+                            <i class="fas fa-info-circle"></i> Alert Levels Guide
+                        </h4>
+                        <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 1rem;">
+                            SeismoSense classifies earthquakes into four alert levels based on multiple seismic parameters:
+                        </p>
+                        <div class="alert-levels">
+                            <div class="alert-level green">
+                                <div class="alert-level-icon">
+                                    <i class="fas fa-check-circle"></i>
+                                </div>
+                                <div class="alert-level-name">Green (Low)</div>
+                                <div class="alert-level-desc">Minor seismic activity, minimal risk</div>
+                            </div>
+                            
+                            <div class="alert-level orange">
+                                <div class="alert-level-icon">
+                                    <i class="fas fa-exclamation-circle"></i>
+                                </div>
+                                <div class="alert-level-name">Orange (Moderate)</div>
+                                <div class="alert-level-desc">Moderate earthquake, some damage possible</div>
+                            </div>
+                            
+                            <div class="alert-level red">
+                                <div class="alert-level-icon">
+                                    <i class="fas fa-radiation"></i>
+                                </div>
+                                <div class="alert-level-name">Red (High)</div>
+                                <div class="alert-level-desc">Major earthquake, significant damage expected</div>
+                            </div>
+                            
+                            <div class="alert-level yellow">
+                                <div class="alert-level-icon">
+                                    <i class="fas fa-eye"></i>
+                                </div>
+                                <div class="alert-level-name">Yellow (Watch)</div>
+                                <div class="alert-level-desc">Elevated activity, potential for escalation</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Quick Tip -->
+                    <div style="margin-top: 1.5rem; padding: 1rem; background: var(--bg-tertiary); border-radius: 10px;">
+                        <h4 style="font-size: 0.85rem; font-weight: 600; margin-bottom: 0.5rem; color: var(--accent);">
+                            <i class="fas fa-lightbulb"></i> Quick Tip
+                        </h4>
+                        <p style="font-size: 0.8rem; color: var(--text-secondary);">
+                            For accurate predictions, use data from reliable seismic monitoring stations. 
+                            CDI and MMI values are typically derived from crowd-sourced reports and instrumental readings.
+                        </p>
+                    </div>
+                </div>
+            </div>
         </div>
-        {% endif %}
-    </div>
+
+        <!-- Performance Tab -->
+        <div class="tab-panel" id="performance-panel">
+            <div class="dashboard-grid">
+                <!-- Confusion Matrix -->
+                <div class="card" style="grid-column: 1 / -1;">
+                    <div class="card-header">
+                        <h2 class="card-title">
+                            <i class="fas fa-th"></i>
+                            Model Performance: Confusion Matrix
+                        </h2>
+                    </div>
+                    
+                    <div class="conf-matrix-container">
+                        <img src="{{ url_for('static', filename='confusion_matrix.png') }}" 
+                             alt="Confusion Matrix" 
+                             class="conf-matrix-img"
+                             style="max-height: 500px;">
+                    </div>
+                    
+                    <div class="stats-grid" style="margin-top: 1.5rem;">
+                        <div class="stat-item">
+                            <div class="stat-value">4</div>
+                            <div class="stat-label">Alert Classes</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value">5</div>
+                            <div class="stat-label">Input Features</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Legend -->
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title">
+                            <i class="fas fa-book"></i>
+                            Reading the Matrix
+                        </h2>
+                    </div>
+                    
+                    <div class="about-text">
+                        <p style="margin-bottom: 1rem;">
+                            The confusion matrix shows how well the model classifies earthquake alerts:
+                        </p>
+                        <ul class="feature-list">
+                            <li>
+                                <i class="fas fa-check"></i>
+                                <strong>Diagonal values</strong> — Correct predictions
+                            </li>
+                            <li>
+                                <i class="fas fa-times"></i>
+                                <strong>Off-diagonal values</strong> — Misclassifications
+                            </li>
+                            <li>
+                                <i class="fas fa-arrow-right"></i>
+                                <strong>Rows</strong> — True actual labels
+                            </li>
+                            <li>
+                                <i class="fas fa-arrow-down"></i>
+                                <strong>Columns</strong> — Predicted labels
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- About Tab -->
+        <div class="tab-panel" id="about-panel">
+            <div class="about-content">
+                <div class="about-card">
+                    <h3 class="about-title">
+                        <i class="fas fa-seismic"></i>
+                        About SeismoSense
+                    </h3>
+                    <p class="about-text">
+                        SeismoSense is an AI-powered earthquake alert classifier that uses machine learning 
+                        to analyze seismic parameters and predict alert levels. The system processes multiple 
+                        input features including magnitude, depth, CDI (Community Decimal Intensity), MMI 
+                        (Modified Mercalli Intensity), and SIG (Significance) to classify earthquakes 
+                        into four alert categories.
+                    </p>
+                </div>
+                
+                <div class="about-card">
+                    <h3 class="about-title">
+                        <i class="fas fa-cogs"></i>
+                        Features
+                    </h3>
+                    <ul class="feature-list">
+                        <li>
+                            <i class="fas fa-bolt"></i>
+                            Real-time earthquake alert prediction
+                        </li>
+                        <li>
+                            <i class="fas fa-brain"></i>
+                            Machine learning-powered classification
+                        </li>
+                        <li>
+                            <i class="fas fa-chart-bar"></i>
+                            Model performance visualization
+                        </li>
+                        <li>
+                            <i class="fas fa-mobile-alt"></i>
+                            Responsive design for all devices
+                        </li>
+                        <li>
+                            <i class="fas fa-shield-alt"></i>
+                            Reliable error handling
+                        </li>
+                    </ul>
+                </div>
+                
+                <div class="about-card">
+                    <h3 class="about-title">
+                        <i class="fas fa-tools"></i>
+                        Technology Stack
+                    </h3>
+                    <div class="tech-stack">
+                        <span class="tech-badge">Python</span>
+                        <span class="tech-badge">Flask</span>
+                        <span class="tech-badge">Scikit-learn</span>
+                        <span class="tech-badge">Pandas</span>
+                        <span class="tech-badge">NumPy</span>
+                        <span class="tech-badge">Seaborn</span>
+                        <span class="tech-badge">Matplotlib</span>
+                        <span class="tech-badge">HTML5</span>
+                        <span class="tech-badge">CSS3</span>
+                        <span class="tech-badge">Font Awesome</span>
+                    </div>
+                </div>
+                
+                <div class="about-card">
+                    <h3 class="about-title">
+                        <i class="fas fa-user"></i>
+                        Credits
+                    </h3>
+                    <p class="about-text">
+                        Built by <strong>Sakib Hossain</strong>. Licensed under the MIT License.<br>
+                        View the source code on <a href="https://github.com/ByteBard58/SeismoSense" target="_blank">GitHub</a>.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Toast Notification Container -->
+    <div id="toast-container" class="toast-container"></div>
 
     <!-- Footer -->
-    <div class="footer">
-        <p>
-            Check the official GitHub repo for this web app
-            <a href="https://github.com/ByteBard58/SeismoSense" target="_blank">here</a>.<br>
-            The SeismoSense is licensed under the <strong>MIT License</strong>.<br>
-            &copy; 2025 <strong>Sakib Hossain</strong>. All rights reserved.
-        </p>
-    </div>
-</div>
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-brand">
+                <span>SeismoSense</span>
+            </div>
+            <div class="footer-links">
+                <a href="https://github.com/ByteBard58/SeismoSense" target="_blank" class="footer-link">
+                    <svg viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
+                    </svg>
+                    GitHub
+                </a>
+            </div>
+            <div class="footer-copyright">
+                &copy; 2026 Sakib Hossain • <a href="https://github.com/ByteBard58/SeismoSense/blob/main/LICENSE" target="_blank" class="footer-link-inline">MIT License</a>
+            </div>
+        </div>
+    </footer>
 
-<script>
-    feather.replace();
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
 
-    const form = document.getElementById('seismoForm');
-    const btn = document.getElementById('predictBtn');
-    const btnText = btn.querySelector('.btn-text');
-    const loader = document.getElementById('loader');
-    const resultContainer = document.getElementById('resultContainer');
-    const confFill = document.getElementById('confFill');
-    const confValue = document.getElementById('confValue');
-
-    form.addEventListener('submit', () => {
-        btn.disabled = true;
-        btnText.textContent = 'Analyzing…';
-        loader.classList.remove('hidden');
-        resultContainer.classList.add('hidden');
-    });
-
-    document.addEventListener('DOMContentLoaded', () => {
-        if (confFill && confValue) {
-            const width = confValue.textContent.trim();
-            resultContainer.classList.remove('hidden');
-            confFill.style.width = '0%';
-            setTimeout(() => {
-                confFill.style.width = width + '%';
-            }, 100);
-        } else if (resultContainer.querySelector('.result')) {
-            resultContainer.classList.remove('hidden');
-        }
-    });
-</script>
 </body>
 </html>

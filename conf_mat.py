@@ -34,7 +34,7 @@ def load_data(path="dataset/earthquake_data.csv") -> np.ndarray:
 
 def plotting(x, y) -> None:
     x_train, x_test, y_train, y_test = train_test_split(
-        x, y, test_size=2/10, random_state=120, shuffle=True, stratify=y
+        x, y, test_size=2/10, random_state=4, shuffle=True, stratify=y
     )
 
     labels = ALERT_LABELS
@@ -46,11 +46,10 @@ def plotting(x, y) -> None:
     # Professional dark theme matching the frontend
     plt.style.use('dark_background')
     
-    BG_COLOR = '#0f1419'          # Dark background
-    CARD_BG = '#1a1f26'           # Card background
+    BG_COLOR = '#151C26'          # Dark background
+    CARD_BG = "#050506"           # Card background
     TEXT_PRIMARY = '#e2e8f0'      # Primary text
     TEXT_SECONDARY = '#94a3b8'     # Muted text
-    ACCENT = '#00d4aa'            # Teal accent
     
     # Alert-specific colors for the heatmap
     ALERT_HEATMAP_COLORS = [

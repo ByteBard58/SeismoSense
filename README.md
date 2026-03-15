@@ -122,7 +122,7 @@ The original mapping used in the repository is:
 
 ## 🧠 Model Performance
 
-The ML pipeline was trained on the **Earthquake Alert Prediction Dataset** using `RandomizedSearchCV` for hyperparameter tuning and **SMOTE** to handle class imbalance.  
+The ML pipeline was trained on the **Earthquake Alert Prediction Dataset** using `XGBClassifier` for hyperparameter tuning and **SMOTE** to handle class imbalance. The model configuration was chosen by running `RandomizedSearchCV`.
 
 **Classification Report on Test Set (260 samples):**
 
@@ -191,8 +191,6 @@ SEISMOSENSE/
 - Extend to batch prediction for CSV uploads.
 
 - Add user authentication and log predictions for research purposes.
-
-**Note:** Due to the absence of front-end web development expertise and the absence of other contributors for the project, I was compelled to utilize AI tools (such as LLM services like ChatGPT™, Grok™, and GitHub Copilot™) to develop a sophisticated front-end for the web app. I am looking forward to human contribution on this project in order to scale it even further.
 
 ---
 

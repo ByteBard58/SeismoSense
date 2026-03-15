@@ -1,11 +1,13 @@
 # app.py
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, redirect, url_for, session
 import joblib
 import numpy as np
 from pathlib import Path
 from fit import main
+import secrets
 
 app = Flask(__name__)
+app.secret_key = secrets.token_hex(32)
 
 # paths to the pickle files
 MODEL_PATH = Path("models/estimator.pkl")
@@ -36,8 +38,6 @@ model, columns = ensure_models()
 # main routes
 @app.route("/", methods=["GET", "POST"])
 def index():
-    result = None
-    confidence = None
     if request.method == "POST":
         try:
             magnitude = float(request.form["magnitude"])
@@ -49,14 +49,23 @@ def index():
             X = np.array([[magnitude, depth, cdi, mmi, sig]])
 
             pred_label = model.predict(X)[0]
+            confidence = None
             if hasattr(model.named_steps["model"], "predict_proba"):
                 proba_array = model.predict_proba(X)[0]
-                confidence = round(100 * proba_array[pred_label], 2)
+                confidence = round((float(100 * proba_array[pred_label])),2)
 
-            result = label_map[pred_label]
+            session["result"] = label_map[pred_label]
+            session["confidence"] = confidence
         except Exception as e:
-            result = f"Error: {str(e)}"
+            session["result"] = f"Error: {str(e)}"
+            session["confidence"] = None
 
+        # PRG: redirect so a page refresh won't re-submit the form
+        return redirect(url_for("index"))
+
+    # GET: consume the result from session (one-time display)
+    result = session.pop("result", None)
+    confidence = session.pop("confidence", None)
     return render_template("index.html", result=result, confidence=confidence)
 
 if __name__ == "__main__":
