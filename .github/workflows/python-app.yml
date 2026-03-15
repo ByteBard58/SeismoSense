@@ -13,8 +13,30 @@ permissions:
   contents: read
 
 jobs:
-  build:
+  changes:
+    runs-on: ubuntu-latest
+    outputs:
+      should_run: ${{ steps.filter.outputs.src }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dorny/paths-filter@v3
+        id: filter
+        with:
+          filters: |
+            src:
+              - 'app.py'
+              - 'fit.py'
+              - 'requirements.txt'
+              - 'templates/**'
+              - 'static/**'
+              - 'models/**'
+              - 'scripts/**'
+              - 'dataset/**'
+              - '.github/workflows/python-app.yml'
 
+  build:
+    needs: changes
+    if: ${{ needs.changes.outputs.should_run == 'true' }}
     runs-on: ubuntu-latest
 
     steps:
@@ -37,6 +59,7 @@ jobs:
     - name: Run Flask app and test with Curl
       run: |
         nohup python app.py &
-        sleep 6
+        sleep 10
         curl -I http://127.0.0.1:5000
         pkill -f "python app.py"
+
