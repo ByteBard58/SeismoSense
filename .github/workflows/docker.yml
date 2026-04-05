@@ -19,14 +19,11 @@ jobs:
             src:
               - 'dataset/**'
               - '.github/workflows/docker.yml'
-              - 'app.py'
+              - 'app/**'
               - 'Dockerfile'
               - 'requirements.txt'
-              - 'templates/**'
-              - 'static/**'
               - 'models/**'
-              - 'scripts/**'
-              - 'fit.py'
+              - 'notebooks/**'
               - '.dockerignore'
 
   docker-build:
