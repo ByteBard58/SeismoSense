@@ -22,12 +22,12 @@ RUN pip install --no-cache-dir --upgrade pip && \
 COPY . .
 
 # example env and port
-ENV PORT=5000
-EXPOSE 5000
+ENV PORT=8000
+EXPOSE 8000
 
 # add healthcheck
 HEALTHCHECK --interval=30s --timeout=30s --start-period=5s --retries=3 \
-  CMD curl -f http://localhost:5000/health || exit 1
+  CMD curl -f http://localhost:8000/health || exit 1
 
 # run the fastapi app using uvicorn workers for production stability
-CMD ["gunicorn", "--bind", "0.0.0.0:5000", "-k", "uvicorn.workers.UvicornWorker", "app.app:app", "--workers", "2"]
+CMD ["gunicorn", "--bind", "0.0.0.0:8000", "-k", "uvicorn.workers.UvicornWorker", "app.app:app", "--workers", "2"]
