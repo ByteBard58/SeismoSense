@@ -49,14 +49,15 @@ pip install -r requirements.txt
 2. Run the Flask app:
 
 ```bash
-python app.py
+python3 -m app.app
 ```
-Open your browser and navigate to [http://127.0.0.1:5000](http://127.0.0.1:5000) to start predicting earthquake alerts!
+Open your browser and navigate to [http://127.0.0.1:8000](http://127.0.0.1:8000) to start predicting earthquake alerts!
 
 3. Run Marimo Notebook (Optional)
 To explore the research notebooks interactively:
 ```bash
-marimo edit research.py
+cd notebooks
+marimo edit notebooks/research.py
 ```
 This command will open the notebook in your default browser. You can then run the cells interactively.
 
@@ -77,14 +78,14 @@ The image is built on both ARM64 and AMD64 architectures, so that it can run on 
 2. Open Terminal and run:
 ```bash
 docker pull bytebard101/seismosense:latest
-docker run --rm -p 5000:5000 bytebard101/seismosense:latest
+docker run --rm -p 8000:8000 bytebard101/seismosense:latest
 ```
 3. If your machine faces a port conflict, you will need to assign another port. Try to run this:
 ```bash
-docker run --rm -p 5001:5000 bytebard101/seismosense:latest
+docker run --rm -p 8001:8000 bytebard101/seismosense:latest
 ```
 > If you followed Step 2 and the command ran successfully, then **DO NOT** follow this step.
-4. The app will be live at localhost:5000. Open your browser and navigate to [http://127.0.0.1:5000](http://127.0.0.1:5000/) (or [http://127.0.0.1:5001](http://127.0.0.1:5000/) if you followed Step 3).
+4. The app will be live at localhost:8000. Open your browser and navigate to [http://127.0.0.1:8000](http://127.0.0.1:8000/) (or [http://127.0.0.1:8001](http://127.0.0.1:8001/) if you followed Step 3).
 
 Check [Docker Documentation](https://docs.docker.com/) to learn more about Docker and it's commands.
 
@@ -147,35 +148,44 @@ SeismoSense/
 │  └─ workflows/
 │     ├─ docker.yml
 │     └─ python-app.yml
+├─ app/
+│  ├─ __pycache__/
+│  ├─ schema/
+│  │  ├─ __init__.py
+│  │  └─ validation.py
+│  ├─ static/
+│  │  ├─ conf_mat.py
+│  │  ├─ confusion_matrix.png
+│  │  ├─ script.js
+│  │  └─ style.css
+│  ├─ templates/
+│  │  └─ index.html
+│  ├─ __init__.py
+│  └─ app.py
 ├─ dataset/
 │  └─ earthquake_data.csv
 ├─ models/
+│  ├─ __init__.py
 │  ├─ estimator.pkl
+│  ├─ fit.py
 │  └─ names.pkl
+├─ notebooks/
+│  └─ research.py
 ├─ reports/
 │  └─ research.html
 ├─ screenshots/
 │  ├─ landing.png
 │  └─ prediction_1.png
-├─ static/
-│  ├─ confusion_matrix.png
-│  ├─ script.js
-│  └─ style.css
-├─ templates/
-│  └─ index.html
 ├─ .dockerignore
 ├─ .gitattributes
 ├─ .gitignore
-├─ app.py
-├─ conf_mat.py
 ├─ Dockerfile
-├─ fit.py
 ├─ LICENSE
 ├─ README.md
-├─ requirements.txt
-├─ research.py
-└─ tree.md
+└─ requirements.txt
 ```
+
+> **Note:** The main application entry point is now `app/app.py`. Run it with `python app/app.py` from the project root.
 
 ---
 
@@ -183,7 +193,7 @@ SeismoSense/
 
 - **Python** 3.13.7
 
-- **Flask** for frontend server
+- **FastAPI** for frontend server
 
 - **scikit-learn** for ML tasks
 
