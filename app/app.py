@@ -1,26 +1,18 @@
-# app.py
-from flask import Flask, render_template, request, redirect, url_for, session
-import joblib
+from .schema.validation import UserInput
+from fastapi import FastAPI, Request , Depends
+from fastapi.responses import JSONResponse
+from typing import List, Tuple
 import numpy as np
+from sklearn.pipeline import Pipeline
+import joblib
+from contextlib import asynccontextmanager
 from pathlib import Path
 from models.fit import main
 import os
 
-# Get the project root directory
-project_root = Path(__file__).parent.parent
-
-app = Flask(__name__,
-            template_folder=str(project_root / "app" / "templates"),
-            static_folder=str(project_root / "app" / "static"))
-app.secret_key = os.environ.get("FLASK_SECRET_KEY", "a_static_secret_key_for_development")
-
 # paths to the pickle files (relative to project root)
 MODEL_PATH = Path(__file__).parent.parent / "models" / "estimator.pkl"
 NAMES_PATH = Path(__file__).parent.parent / "models" / "names.pkl"
-
-
-# inverse encoding
-label_map = {0: "green", 1: "orange", 2: "red", 3: "yellow"}
 
 # if pickle files are not found, this function will train the model
 def ensure_models():
@@ -38,40 +30,64 @@ def ensure_models():
     print("✅ Model and feature names loaded successfully.")
     return model, names
 
-model, columns = ensure_models()
+@asynccontextmanager
+async def lifespan(app:FastAPI):
+    pipe,feat_names = ensure_models()
 
-# main routes
-@app.route("/", methods=["GET", "POST"])
-def index():
-    if request.method == "POST":
-        try:
-            magnitude = float(request.form["magnitude"])
-            depth = float(request.form["depth"])
-            cdi = float(request.form["cdi"])
-            mmi = float(request.form["mmi"])
-            sig = float(request.form["sig"])
+    app.state.pipe = pipe
+    app.state.feat_names = feat_names
 
-            X = np.array([[magnitude, depth, cdi, mmi, sig]])
+    yield
 
-            pred_label = model.predict(X)[0]
-            confidence = None
-            if hasattr(model.named_steps["model"], "predict_proba"):
-                proba_array = model.predict_proba(X)[0]
-                confidence = round((float(100 * proba_array[pred_label])),2)
+app = FastAPI(title="Seismosense",version="2.0(FastAPI)",lifespan=lifespan)
 
-            session["result"] = label_map[pred_label]
-            session["confidence"] = confidence
-        except Exception as e:
-            session["result"] = f"Error: {str(e)}"
-            session["confidence"] = None
+def get_things(request:Request) -> Tuple[Pipeline,np.ndarray]:
+    return request.app.state.pipe, request.app.state.feat_names
 
-        # PRG: redirect so a page refresh won't re-submit the form
-        return redirect(url_for("index"))
+@app.get("/")
+def home():
+    strr = "Welcome to Seismosense API. Provide the required inputs properly in " \
+    "the POST route to run predictions. Check the GitHub repo for more."
+    return strr
 
-    # GET: consume the result from session (one-time display)
-    result = session.pop("result", None)
-    confidence = session.pop("confidence", None)
-    return render_template("index.html", result=result, confidence=confidence)
+@app.get("/health",status_code= 200)
+def health_check():
+    msg = {
+        "title":"Seismosense",
+        "version":"2.0(FastAPI)",
+        "status":"All systems operational"
+    }
+    return JSONResponse(content=msg,status_code=200)
 
-if __name__ == "__main__":
-    app.run()
+@app.post("/predict",status_code=201)
+def predict_things(value:UserInput,dep:Tuple[Pipeline,np.ndarray] = Depends(get_things)):
+    pipe,feat_names = dep
+    feat_names:List[str] = feat_names.tolist()
+    value:dict = value.model_dump(mode="json")
+
+    # Order check and running prediction
+    user_inp:list[float] = []
+    for i in feat_names:
+        if i in ["alert"]:
+            continue
+        else:
+            user_inp.append(value.get(i))
+    
+    user_inp = np.array(user_inp).reshape(1,-1)
+    pred_label:np.ndarray = pipe.predict(user_inp)[0]
+    pred_proba:np.ndarray = pipe.predict_proba(user_inp)[0]
+
+    # Postprocessing
+    label_map = {0: "green", 1: "orange", 2: "red", 3: "yellow"}
+    pred_label:str = label_map.get(pred_label)
+    pred_proba = {key:round(val,3) for key,val in zip(label_map.values(),pred_proba.tolist())}
+
+    # Final Output
+    msg = {
+        "message": "prediction successful",
+        "prediction": pred_label, 
+        "probabilities": pred_proba
+    }
+    return JSONResponse(
+        status_code=201, content=msg
+    )
