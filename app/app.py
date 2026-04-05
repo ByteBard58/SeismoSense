@@ -3,7 +3,7 @@ from flask import Flask, render_template, request, redirect, url_for, session
 import joblib
 import numpy as np
 from pathlib import Path
-from fit import main
+from models.fit import main
 import os
 
 app = Flask(__name__)
