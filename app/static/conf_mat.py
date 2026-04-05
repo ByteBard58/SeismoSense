@@ -7,9 +7,12 @@ import joblib
 import pandas as pd
 import numpy as np
 from sklearn.preprocessing import LabelEncoder
+from pathlib import Path
 
-file_path = "dataset/earthquake_data.csv"
-model = joblib.load("models/estimator.pkl")
+# Get project root directory (parent of app/)
+PROJECT_ROOT = Path(__file__).parent.parent.parent
+file_path = PROJECT_ROOT / "dataset" / "earthquake_data.csv"
+model = joblib.load(PROJECT_ROOT / "models" / "estimator.pkl")
 
 # Earthquake alert labels matching the app.py label_map
 # 0: green (Low), 1: orange (Moderate), 2: red (High), 3: yellow (Watch)
@@ -21,7 +24,11 @@ ALERT_COLORS = {
     'Yellow': '#facc15'  # yellow - watch
 }
 
-def load_data(path="dataset/earthquake_data.csv") -> np.ndarray:
+def load_data(path=None) -> np.ndarray:
+  if path is None:
+    path = PROJECT_ROOT / "dataset" / "earthquake_data.csv"
+  else:
+    path = PROJECT_ROOT / "dataset" / path if isinstance(path, str) else path
   df = pd.read_csv(path)
 
   x = df.iloc[:,:-1].to_numpy()
@@ -148,7 +155,7 @@ def plotting(x, y) -> None:
     # ── Save ─────────────────────────────────────────────────────────────────────
     plt.tight_layout()
     plt.savefig(
-        "static/confusion_matrix.png",
+        PROJECT_ROOT / "app" / "static" / "confusion_matrix.png",
         dpi=150,
         facecolor=BG_COLOR,
         edgecolor='none',

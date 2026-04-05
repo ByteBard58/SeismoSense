@@ -6,12 +6,17 @@ from pathlib import Path
 from models.fit import main
 import os
 
-app = Flask(__name__)
+# Get the project root directory
+project_root = Path(__file__).parent.parent
+
+app = Flask(__name__,
+            template_folder=str(project_root / "app" / "templates"),
+            static_folder=str(project_root / "app" / "static"))
 app.secret_key = os.environ.get("FLASK_SECRET_KEY", "a_static_secret_key_for_development")
 
-# paths to the pickle files
-MODEL_PATH = Path("models/estimator.pkl")
-NAMES_PATH = Path("models/names.pkl")
+# paths to the pickle files (relative to project root)
+MODEL_PATH = Path(__file__).parent.parent / "models" / "estimator.pkl"
+NAMES_PATH = Path(__file__).parent.parent / "models" / "names.pkl"
 
 
 # inverse encoding
