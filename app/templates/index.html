@@ -7,7 +7,7 @@
 
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="stylesheet" href="/static/style.css">
 
 </head>
 <body>
@@ -123,34 +123,14 @@
                         </h2>
                     </div>
                     
-                    {% if result and result != 'Error' %}
-                    <div class="result-card {{ result }}">
-                        <div class="result-header">
-                            <span class="result-label">Predicted Alert</span>
-                            <span class="result-value">{{ result | upper }}</span>
+                    <div id="result-container">
+                        <div class="empty-result">
+                            <div class="empty-icon">
+                                <i class="fas fa-seismic"></i>
+                            </div>
+                            <p class="empty-text">Enter earthquake parameters and click "Analyze &amp; Predict"</p>
                         </div>
-                        {% if confidence %}
-                        <div class="confidence-bar">
-                            <div class="confidence-fill {{ result }}" id="confFill" style="width: 0%;"></div>
-                        </div>
-                        <p class="confidence-text">
-                            Confidence: <span id="confValue">{{ confidence }}</span>%
-                        </p>
-                        {% endif %}
                     </div>
-                    {% elif result and result.startswith('Error') %}
-                    <div class="error-message">
-                        <i class="fas fa-exclamation-triangle"></i>
-                        {{ result }}
-                    </div>
-                    {% else %}
-                    <div class="empty-result">
-                        <div class="empty-icon">
-                            <i class="fas fa-seismic"></i>
-                        </div>
-                        <p class="empty-text">Enter earthquake parameters and click "Analyze &amp; Predict"</p>
-                    </div>
-                    {% endif %}
                     
                     <!-- Alert Level Cards with Descriptions -->
                     <div style="margin-top: 1.5rem;">
@@ -222,7 +202,7 @@
                     </div>
                     
                     <div class="conf-matrix-container">
-                        <img src="{{ url_for('static', filename='confusion_matrix.png') }}" 
+                        <img src="/static/confusion_matrix.png" 
                              alt="Confusion Matrix" 
                              class="conf-matrix-img"
                              style="max-height: 500px;">
@@ -379,7 +359,7 @@
         </div>
     </footer>
 
-    <script src="{{ url_for('static', filename='script.js') }}"></script>
+    <script src="/static/script.js"></script>
 
 </body>
 </html>

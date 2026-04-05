@@ -59,13 +59,82 @@ const btnText = btn ? btn.querySelector('.btn-text') : null;
 const loader = document.getElementById('loader');
 
 if (form && btn && btnText) {
-    form.addEventListener('submit', () => {
+    form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        
         // Show loading state
         btn.disabled = true;
         btnText.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> Analyzing...';
         
         if (loader) {
             loader.style.display = 'inline-block';
+        }
+
+        const payload = {
+            magnitude: parseFloat(document.getElementById('magnitude').value),
+            depth: parseFloat(document.getElementById('depth').value),
+            cdi: parseFloat(document.getElementById('cdi').value),
+            mmi: parseFloat(document.getElementById('mmi').value),
+            sig: parseFloat(document.getElementById('sig').value)
+        };
+
+        try {
+            const response = await fetch('/predict', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+            
+            const data = await response.json();
+            
+            if (response.ok) {
+                showToast('Prediction successful!', 'success');
+                const result = data.prediction;
+                const confidences = data.probabilities;
+                const confidence = confidences[result] * 100;
+                
+                const resultContainer = document.getElementById('result-container');
+                if (resultContainer) {
+                    resultContainer.innerHTML = `
+                        <div class="result-card ${result}">
+                            <div class="result-header">
+                                <span class="result-label">Predicted Alert</span>
+                                <span class="result-value">${result.toUpperCase()}</span>
+                            </div>
+                            <div class="confidence-bar">
+                                <div class="confidence-fill ${result}" id="confFill" style="width: 0%;"></div>
+                            </div>
+                            <p class="confidence-text">
+                                Confidence: <span id="confValue">${confidence.toFixed(1)}</span>%
+                            </p>
+                        </div>
+                    `;
+                    
+                    setTimeout(() => {
+                        const fill = document.getElementById('confFill');
+                        if (fill) fill.style.width = confidence.toFixed(1) + '%';
+                    }, 100);
+                }
+            } else if (response.status === 422) {
+                if (data.detail && Array.isArray(data.detail)) {
+                    data.detail.forEach(err => {
+                        const field = err.loc[err.loc.length - 1];
+                        showToast(`Validation Error (${field}): ${err.msg}`, 'error');
+                    });
+                } else {
+                    showToast('Validation Error', 'error');
+                }
+            } else {
+                showToast(data.message || 'An error occurred', 'error');
+            }
+        } catch (error) {
+            showToast('Network error or server down', 'error');
+        } finally {
+            btn.disabled = false;
+            btnText.innerHTML = '<i class="fas fa-bolt"></i> Analyze & Predict';
+            if (loader) {
+                loader.style.display = 'none';
+            }
         }
     });
 }
@@ -78,42 +147,17 @@ if (clearBtn && form) {
             input.value = '';
         });
         form.querySelector('.form-input').focus();
+        
+        const resultContainer = document.getElementById('result-container');
+        if (resultContainer) {
+            resultContainer.innerHTML = `
+                <div class="empty-result">
+                    <div class="empty-icon">
+                        <i class="fas fa-seismic"></i>
+                    </div>
+                    <p class="empty-text">Enter earthquake parameters and click "Analyze &amp; Predict"</p>
+                </div>
+            `;
+        }
     });
 }
-
-
-// On page load, reset button state and animate confidence bar
-document.addEventListener('DOMContentLoaded', () => {
-    // Reset button state (in case of page reload with result)
-    if (btn && btnText) {
-        btn.disabled = false;
-        btnText.innerHTML = '<i class="fas fa-bolt"></i> Analyze & Predict';
-        
-        if (loader) {
-            loader.style.display = 'none';
-        }
-    }
-    
-    // Show toast if there's a result
-    const resultCard = document.querySelector('.result-card');
-    if (resultCard) {
-        const result = resultCard.classList.contains('green') ? 'Green Alert' :
-                      resultCard.classList.contains('orange') ? 'Orange Alert' :
-                      resultCard.classList.contains('red') ? 'Red Alert' :
-                      resultCard.classList.contains('yellow') ? 'Yellow Alert' : null;
-        if (result) {
-            showToast('Prediction complete!', 'success');
-        }
-    }
-    
-    // Animate confidence bar if result exists
-    const confFill = document.getElementById('confFill');
-    const confValue = document.getElementById('confValue');
-    
-    if (confFill && confValue) {
-        const width = confValue.textContent.trim();
-        setTimeout(() => {
-            confFill.style.width = width + '%';
-        }, 100);
-    }
-});

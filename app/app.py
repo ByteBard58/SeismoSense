@@ -1,6 +1,7 @@
 from .schema.validation import UserInput
 from fastapi import FastAPI, Request , Depends
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, FileResponse
+from fastapi.staticfiles import StaticFiles
 from typing import List, Tuple
 import numpy as np
 from sklearn.pipeline import Pipeline
@@ -8,7 +9,6 @@ import joblib
 from contextlib import asynccontextmanager
 from pathlib import Path
 from models.fit import main
-import os
 
 # paths to the pickle files (relative to project root)
 MODEL_PATH = Path(__file__).parent.parent / "models" / "estimator.pkl"
@@ -41,14 +41,15 @@ async def lifespan(app:FastAPI):
 
 app = FastAPI(title="Seismosense",version="2.0(FastAPI)",lifespan=lifespan)
 
+app.mount("/static", StaticFiles(directory=Path(__file__).parent / "static"), name="static")
+
 def get_things(request:Request) -> Tuple[Pipeline,np.ndarray]:
     return request.app.state.pipe, request.app.state.feat_names
 
 @app.get("/")
 def home():
-    strr = "Welcome to Seismosense API. Provide the required inputs properly in " \
-    "the POST route to run predictions. Check the GitHub repo for more."
-    return strr
+    index_path = Path(__file__).parent / "templates" / "index.html"
+    return FileResponse(index_path)
 
 @app.get("/health",status_code= 200)
 def health_check():
