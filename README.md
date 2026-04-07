@@ -1,6 +1,6 @@
 # SeismoSense 🌍
 
-**SeismoSense** is an AI-powered earthquake alert prediction system that leverages machine learning to analyze seismic data and provide instant alert predictions. This project combines cutting-edge ML pipelines, SMOTE oversampling for imbalanced data, and a sleek, futuristic Flask frontend with animated confidence bars.  
+**SeismoSense** is an AI-powered earthquake alert prediction system that leverages machine learning to analyze seismic data and provide instant alert predictions. This project combines cutting-edge ML pipelines, SMOTE oversampling for imbalanced data, and a sleek, futuristic frontend with sophisticated animations, all wrapped with a FastAPI-powered backend.  
 
 ---
 
@@ -46,10 +46,10 @@ cd SeismoSense
 pip install -r requirements.txt
 ```
 
-2. Run the Flask app:
+2. Run the FastAPI app:
 
 ```bash
-python3 -m app.app
+uvicorn app.app:app --reload
 ```
 Open your browser and navigate to [http://127.0.0.1:8000](http://127.0.0.1:8000) to start predicting earthquake alerts!
 

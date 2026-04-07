@@ -9,7 +9,7 @@ def _(mo):
     mo.md(r"""
     # SeismoSense
 
-    The SeismoSense is a ML classifier project which predicts the alret level of an earthquake based on user-given inputs. The project serves through a Flask web app.
+    The SeismoSense is a ML classifier project which predicts the alret level of an earthquake based on user-given inputs. The project serves through a FastAPI web app.
 
     In order to develop the perfect ML model for the project, we need to do lots of research and we also need to write the code somewhere else before putting it in the final script. This notebook is solely created for that purpose. It is used as a playground to test different hyperparameter settings as well as preprocessing approaches.
     """)
