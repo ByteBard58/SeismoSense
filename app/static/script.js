@@ -253,9 +253,11 @@ function displayBatchResults(data) {
     });
 
     let tableRows = '';
+    const predictionDetails = { green: [], orange: [], red: [], yellow: [] };
     predictions.forEach((pred, i) => {
         const probs = probabilities[i];
         const maxProb = Math.max(...probs) * 100;
+        predictionDetails[pred].push(i + 1);
         tableRows += `
             <tr>
                 <td>${i + 1}</td>
@@ -266,6 +268,9 @@ function displayBatchResults(data) {
     });
 
     container.innerHTML = `
+        <div class="chart-container" style="display: block;">
+            <canvas id="batchPieChart"></canvas>
+        </div>
         <div class="batch-summary">
             <div class="batch-stat">
                 <div class="batch-stat-value">${count}</div>
@@ -301,6 +306,51 @@ function displayBatchResults(data) {
             </tbody>
         </table>
     `;
+
+    const ctx = document.getElementById('batchPieChart');
+    if (ctx) {
+        new Chart(ctx, {
+            type: 'pie',
+            data: {
+                labels: ['Green', 'Orange', 'Red', 'Yellow'],
+                datasets: [{
+                    data: [counts.green, counts.orange, counts.red, counts.yellow],
+                    backgroundColor: ['#22c55e', '#f97316', '#ef4444', '#eab308'],
+                    borderColor: ['#22c55e', '#f97316', '#ef4444', '#eab308'],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: {
+                            color: '#8b949e'
+                        }
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                const label = context.label || '';
+                                const value = context.raw || 0;
+                                const predictionList = predictionDetails[label.toLowerCase()];
+                                return `${label}: ${value} predictions`;
+                            },
+                            afterLabel: function(context) {
+                                const label = context.label || '';
+                                const predictionList = predictionDetails[label.toLowerCase()];
+                                if (predictionList && predictionList.length > 0) {
+                                    return `Rows: ${predictionList.join(', ')}`;
+                                }
+                                return '';
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    }
 }
 
 // Clear batch button
@@ -321,6 +371,9 @@ if (clearBatchBtn && batchForm) {
                         <i class="fas fa-file-csv"></i>
                     </div>
                     <p class="empty-text">Upload a CSV file and click "Run Batch Prediction"</p>
+                </div>
+                <div class="chart-container" style="display: none;">
+                    <canvas id="batchPieChart"></canvas>
                 </div>
             `;
         }
