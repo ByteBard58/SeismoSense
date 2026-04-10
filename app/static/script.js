@@ -168,7 +168,14 @@ const fileNameDisplay = document.getElementById('fileName');
 if (csvFileInput && fileNameDisplay) {
     csvFileInput.addEventListener('change', (e) => {
         if (e.target.files.length > 0) {
-            fileNameDisplay.textContent = e.target.files[0].name;
+            const file = e.target.files[0];
+            if (file.size > 5 * 1024 * 1024) {
+                showToast('File size exceeds 5MB limit. Please upload a smaller file.', 'error');
+                file.value = '';
+                fileNameDisplay.textContent = 'Choose CSV file...';
+                return;
+            }
+            fileNameDisplay.textContent = file.name;
         }
     });
 }

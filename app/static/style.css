@@ -950,3 +950,36 @@ body::before {
     margin-left: auto;
     margin-right: auto;
 }
+
+.batch-help {
+    margin-top: 1.5rem;
+    padding: 1rem;
+    background: var(--bg-tertiary);
+    border-radius: 10px;
+    border-left: 3px solid var(--accent);
+}
+
+.batch-help h4 {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--accent);
+    margin-bottom: 0.5rem;
+}
+
+.batch-help p {
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    margin-bottom: 0.5rem;
+}
+
+.batch-columns {
+    padding: 0.5rem;
+    background: var(--bg-input);
+    border-radius: 5px;
+    text-align: center;
+}
+
+.batch-columns code {
+    color: var(--accent);
+    font-family: 'JetBrains Mono', monospace;
+}
