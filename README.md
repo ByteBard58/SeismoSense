@@ -33,6 +33,8 @@
 2. **Prediction Result with Confidence Bar**  
    ![Screenshot Result](screenshots/prediction_1.png)
 
+3. **Prediction Result for Batch prediction**  
+   ![Screenshot Result](screenshots/batch_pred.png)
 
 ---
 
