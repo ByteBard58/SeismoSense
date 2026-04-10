@@ -29,3 +29,4 @@ instance/
 shit/
 *.db
 .vscode/
+dataset/sample.csv

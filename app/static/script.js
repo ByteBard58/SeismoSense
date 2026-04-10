@@ -161,3 +161,228 @@ if (clearBtn && form) {
         }
     });
 }
+
+// File input display
+const csvFileInput = document.getElementById('csvfile');
+const fileNameDisplay = document.getElementById('fileName');
+if (csvFileInput && fileNameDisplay) {
+    csvFileInput.addEventListener('change', (e) => {
+        if (e.target.files.length > 0) {
+            const file = e.target.files[0];
+            if (file.size > 5 * 1024 * 1024) {
+                showToast('File size exceeds 5MB limit. Please upload a smaller file.', 'error');
+                file.value = '';
+                fileNameDisplay.textContent = 'Choose CSV file...';
+                return;
+            }
+            fileNameDisplay.textContent = file.name;
+        }
+    });
+}
+
+// Batch Prediction Form
+const batchForm = document.getElementById('batchForm');
+const batchBtn = document.getElementById('batchPredictBtn');
+const batchLoader = document.getElementById('batchLoader');
+
+if (batchForm && batchBtn) {
+    batchForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        
+        const fileInput = document.getElementById('csvfile');
+        if (!fileInput || !fileInput.files.length) {
+            showToast('Please select a CSV file', 'error');
+            return;
+        }
+
+        const formData = new FormData();
+        formData.append('payload', fileInput.files[0]);
+
+        const btnText = batchBtn.querySelector('.btn-text');
+        batchBtn.disabled = true;
+        if (btnText) {
+            btnText.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> Processing...';
+        }
+        if (batchLoader) {
+            batchLoader.style.display = 'inline-block';
+        }
+
+        try {
+            const response = await fetch('/predict/batch', {
+                method: 'POST',
+                body: formData
+            });
+            
+            const data = await response.json();
+            
+            if (response.ok) {
+                showToast('Batch prediction successful!', 'success');
+                displayBatchResults(data);
+            } else if (response.status === 422) {
+                if (data.detail) {
+                    showToast(data.detail, 'error');
+                } else if (Array.isArray(data.detail)) {
+                    data.detail.forEach(err => {
+                        const field = err.loc ? err.loc[err.loc.length - 1] : 'validation';
+                        showToast(`Validation Error (${field}): ${err.msg}`, 'error');
+                    });
+                } else {
+                    showToast('Validation Error', 'error');
+                }
+            } else {
+                showToast(data.message || 'An error occurred', 'error');
+            }
+        } catch (error) {
+            showToast('Network error or server down', 'error');
+        } finally {
+            batchBtn.disabled = false;
+            if (btnText) {
+                btnText.innerHTML = '<i class="fas fa-bolt"></i> Run Batch Prediction';
+            }
+            if (batchLoader) {
+                batchLoader.style.display = 'none';
+            }
+        }
+    });
+}
+
+function displayBatchResults(data) {
+    const container = document.getElementById('batch-result-container');
+    if (!container) return;
+
+    const predictions = data.prediction;
+    const probabilities = data.probabilities;
+    const count = predictions.length;
+
+    const counts = { green: 0, orange: 0, red: 0, yellow: 0 };
+    predictions.forEach(p => {
+        if (counts[p] !== undefined) counts[p]++;
+    });
+
+    let tableRows = '';
+    const predictionDetails = { green: [], orange: [], red: [], yellow: [] };
+    predictions.forEach((pred, i) => {
+        const probs = probabilities[i];
+        const maxProb = Math.max(...probs) * 100;
+        predictionDetails[pred].push(i + 1);
+        tableRows += `
+            <tr>
+                <td>${i + 1}</td>
+                <td class="alert-cell ${pred}">${pred.toUpperCase()}</td>
+                <td>${maxProb.toFixed(1)}%</td>
+            </tr>
+        `;
+    });
+
+    container.innerHTML = `
+        <div class="chart-container" style="display: block;">
+            <canvas id="batchPieChart"></canvas>
+        </div>
+        <div class="batch-summary">
+            <div class="batch-stat">
+                <div class="batch-stat-value">${count}</div>
+                <div class="batch-stat-label">Total Predictions</div>
+            </div>
+            <div class="batch-stat">
+                <div class="batch-stat-value" style="color: var(--green);">${counts.green}</div>
+                <div class="batch-stat-label">Green</div>
+            </div>
+            <div class="batch-stat">
+                <div class="batch-stat-value" style="color: var(--orange);">${counts.orange}</div>
+                <div class="batch-stat-label">Orange</div>
+            </div>
+            <div class="batch-stat">
+                <div class="batch-stat-value" style="color: var(--red);">${counts.red}</div>
+                <div class="batch-stat-label">Red</div>
+            </div>
+            <div class="batch-stat">
+                <div class="batch-stat-value" style="color: var(--yellow);">${counts.yellow}</div>
+                <div class="batch-stat-label">Yellow</div>
+            </div>
+        </div>
+        <table class="batch-results-table">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Alert</th>
+                    <th>Confidence</th>
+                </tr>
+            </thead>
+            <tbody>
+                ${tableRows}
+            </tbody>
+        </table>
+    `;
+
+    const ctx = document.getElementById('batchPieChart');
+    if (ctx) {
+        new Chart(ctx, {
+            type: 'pie',
+            data: {
+                labels: ['Green', 'Orange', 'Red', 'Yellow'],
+                datasets: [{
+                    data: [counts.green, counts.orange, counts.red, counts.yellow],
+                    backgroundColor: ['#22c55e', '#f97316', '#ef4444', '#eab308'],
+                    borderColor: ['#22c55e', '#f97316', '#ef4444', '#eab308'],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: {
+                            color: '#8b949e'
+                        }
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                const label = context.label || '';
+                                const value = context.raw || 0;
+                                const predictionList = predictionDetails[label.toLowerCase()];
+                                return `${label}: ${value} predictions`;
+                            },
+                            afterLabel: function(context) {
+                                const label = context.label || '';
+                                const predictionList = predictionDetails[label.toLowerCase()];
+                                if (predictionList && predictionList.length > 0) {
+                                    return `Rows: ${predictionList.join(', ')}`;
+                                }
+                                return '';
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    }
+}
+
+// Clear batch button
+const clearBatchBtn = document.getElementById('clearBatchBtn');
+if (clearBatchBtn && batchForm) {
+    clearBatchBtn.addEventListener('click', () => {
+        const fileInput = document.getElementById('csvfile');
+        if (fileInput) fileInput.value = '';
+        
+        const fileNameDisplay = document.getElementById('fileName');
+        if (fileNameDisplay) fileNameDisplay.textContent = 'Choose CSV file...';
+        
+        const batchContainer = document.getElementById('batch-result-container');
+        if (batchContainer) {
+            batchContainer.innerHTML = `
+                <div class="empty-result">
+                    <div class="empty-icon">
+                        <i class="fas fa-file-csv"></i>
+                    </div>
+                    <p class="empty-text">Upload a CSV file and click "Run Batch Prediction"</p>
+                </div>
+                <div class="chart-container" style="display: none;">
+                    <canvas id="batchPieChart"></canvas>
+                </div>
+            `;
+        }
+    });
+}

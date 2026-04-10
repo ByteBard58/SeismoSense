@@ -7,6 +7,7 @@
 
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link rel="stylesheet" href="/static/style.css">
 
 </head>
@@ -23,6 +24,10 @@
                 <button class="nav-tab active" data-tab="predict">
                     <i class="fas fa-bolt"></i>
                     <span>Predict</span>
+                </button>
+                <button class="nav-tab" data-tab="batch">
+                    <i class="fas fa-file-csv"></i>
+                    <span>Batch</span>
                 </button>
                 <button class="nav-tab" data-tab="performance">
                     <i class="fas fa-chart-line"></i>
@@ -43,7 +48,7 @@
         <div class="tab-panel active" id="predict-panel">
             <div class="dashboard-grid">
                 
-                <!-- Input Form -->
+                <!-- Single Prediction Form -->
                 <div class="card">
                     <div class="card-header">
                         <h2 class="card-title">
@@ -184,6 +189,81 @@
                             For accurate predictions, use data from reliable seismic monitoring stations. 
                             CDI and MMI values are typically derived from crowd-sourced reports and instrumental readings.
                         </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Batch Tab -->
+        <div class="tab-panel" id="batch-panel">
+            <div class="dashboard-grid">
+                
+                <!-- Batch Prediction Form -->
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title">
+                            <i class="fas fa-file-csv"></i>
+                            Batch Prediction
+                        </h2>
+                    </div>
+                    
+                    <form method="POST" id="batchForm" enctype="multipart/form-data">
+                        <div class="form-group">
+                            <label class="form-label">
+                                Upload CSV File <span class="required">*</span>
+                            </label>
+                            <div class="file-upload-wrapper">
+                                <input type="file" name="csvfile" id="csvfile" accept=".csv" class="file-input" required>
+                                <label for="csvfile" class="file-label">
+                                    <i class="fas fa-cloud-upload-alt"></i>
+                                    <span id="fileName">Choose CSV file...</span>
+                                </label>
+                            </div>
+                            <p class="form-help">CSV must contain columns: magnitude, depth, cdi, mmi, sig</p>
+                        </div>
+
+                        <div class="btn-row">
+                            <button type="submit" class="btn" id="batchPredictBtn">
+                                <span class="btn-text">
+                                    <i class="fas fa-bolt"></i>
+                                    Run Batch Prediction
+                                </span>
+                                <span class="spinner" id="batchLoader"></span>
+                            </button>
+                            <button type="button" class="btn btn-secondary" id="clearBatchBtn">
+                                <i class="fas fa-times"></i>
+                                Clear
+                            </button>
+                        </div>
+                        
+                        <div class="batch-help">
+                            <h4><i class="fas fa-info-circle"></i> CSV Format Guide</h4>
+                            <p>Your CSV file must contain exactly 5 columns in this order:</p>
+                            <p class="batch-columns"><code>magnitude, depth, cdi, mmi, sig</code></p>
+                            <p><strong>Important:</strong> Incorrect column names or order will result in validation errors. Ensure all values are numeric. Files larger than 5MB are not accepted.</p>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Batch Results -->
+                <div class="card" id="batchResultPanel">
+                    <div class="card-header">
+                        <h2 class="card-title">
+                            <i class="fas fa-list-alt"></i>
+                            Batch Results
+                        </h2>
+                    </div>
+                    
+                    <div id="batch-result-container">
+                        <div class="empty-result">
+                            <div class="empty-icon">
+                                <i class="fas fa-file-csv"></i>
+                            </div>
+                            <p class="empty-text">Upload a CSV file and click "Run Batch Prediction"</p>
+                        </div>
+                        <div class="chart-container" style="display: none;">
+                            <canvas id="batchPieChart"></canvas>
+                        </div>
                     </div>
                 </div>
             </div>
