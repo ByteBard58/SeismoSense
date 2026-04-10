@@ -43,7 +43,66 @@
         <div class="tab-panel active" id="predict-panel">
             <div class="dashboard-grid">
                 
-                <!-- Input Form -->
+                <!-- Batch Prediction Form -->
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title">
+                            <i class="fas fa-file-csv"></i>
+                            Batch Prediction
+                        </h2>
+                    </div>
+                    
+                    <form method="POST" id="batchForm" enctype="multipart/form-data">
+                        <div class="form-group">
+                            <label class="form-label">
+                                Upload CSV File <span class="required">*</span>
+                            </label>
+                            <div class="file-upload-wrapper">
+                                <input type="file" name="csvfile" id="csvfile" accept=".csv" class="file-input" required>
+                                <label for="csvfile" class="file-label">
+                                    <i class="fas fa-cloud-upload-alt"></i>
+                                    <span id="fileName">Choose CSV file...</span>
+                                </label>
+                            </div>
+                            <p class="form-help">CSV must contain columns: magnitude, depth, cdi, mmi, sig</p>
+                        </div>
+
+                        <div class="btn-row">
+                            <button type="submit" class="btn" id="batchPredictBtn">
+                                <span class="btn-text">
+                                    <i class="fas fa-bolt"></i>
+                                    Run Batch Prediction
+                                </span>
+                                <span class="spinner" id="batchLoader"></span>
+                            </button>
+                            <button type="button" class="btn btn-secondary" id="clearBatchBtn">
+                                <i class="fas fa-times"></i>
+                                Clear
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Batch Results -->
+                <div class="card" id="batchResultPanel">
+                    <div class="card-header">
+                        <h2 class="card-title">
+                            <i class="fas fa-list-alt"></i>
+                            Batch Results
+                        </h2>
+                    </div>
+                    
+                    <div id="batch-result-container">
+                        <div class="empty-result">
+                            <div class="empty-icon">
+                                <i class="fas fa-file-csv"></i>
+                            </div>
+                            <p class="empty-text">Upload a CSV file and click "Run Batch Prediction"</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Single Prediction Form -->
                 <div class="card">
                     <div class="card-header">
                         <h2 class="card-title">
